@@ -8,7 +8,7 @@ local LOGO_ID = 116345727167504
 local VERSION = "Delta-2.745.1142"
 
 --==================================================
--- [1] CUSTOM THEME (ដូច website: dark + cyan/green + purple)
+-- [1] CUSTOM THEME
 --==================================================
 
 local SPTheme = {
@@ -81,7 +81,7 @@ local Window = Rayfield:CreateWindow({
 })
 
 --==================================================
--- [2.1] CUSTOM LOGO (ទាញពី GitHub: logo.png)
+-- [2.1] CUSTOM LOGO
 --==================================================
 
 local LOGO_URL = "https://raw.githubusercontent.com/Panha1414/SP-SCRIPT-HUB/main/logo.png"
@@ -106,7 +106,7 @@ task.spawn(function()
 
         local data = game:HttpGet(LOGO_URL)
         if #data < 200 then
-            error("ទាញ logo បរាជ័យ (size=" .. #data .. "): " .. data:sub(1, 40))
+            error("ទាញ logo បរាជ័យ (size=" .. #data .. ")")
         end
 
         writefile("SP_logo.png", data)
@@ -155,6 +155,66 @@ local function CopyLink(label, link)
     end
 end
 
+local LastLoadedScript = nil
+
+local function CloseLoadedScripts()
+    local cleaned = 0
+    local roots = {}
+    pcall(function()
+        table.insert(roots, game:GetService("CoreGui"))
+        if gethui then table.insert(roots, gethui()) end
+        local lp = game:GetService("Players").LocalPlayer
+        if lp then
+            table.insert(roots, lp:FindFirstChild("PlayerGui"))
+        end
+    end)
+
+    -- Never destroy our own Rayfield (name == "Rayfield")
+    local keywords = {
+        "fluent", "orchid", "linoria", "venyx", "chilli", "spicy", "codium", "fyy",
+        "nyx", "tenshi", "windui", "kavo", "material", "simple", "maclib",
+        "orange", "redz", "lumin", "solara", "sirius", "hubui", "scriptgui",
+        "library", "menu", "window", "esp", "aimbot", "farm"
+    }
+
+    for _, root in ipairs(roots) do
+        if root then
+            for _, child in ipairs(root:GetChildren()) do
+                local name = tostring(child.Name):lower()
+
+                if child.Name == "Rayfield" then
+                    -- protect our hub
+                else
+                    local match = false
+                    for _, kw in ipairs(keywords) do
+                        if name:find(kw) then
+                            match = true
+                            break
+                        end
+                    end
+                    if match then
+                        pcall(function()
+                            child:Destroy()
+                            cleaned = cleaned + 1
+                        end)
+                    end
+                end
+            end
+        end
+    end
+
+    pcall(function()
+        if getgenv then
+            getgenv().SP_Unload = true
+            getgenv().Unload = true
+            getgenv().ChilliUnload = true
+        end
+    end)
+
+    LastLoadedScript = nil
+    return cleaned
+end
+
 local function LoadScript(scriptName, scriptURL)
     Notify("SP ROBLOX", "កំពុងបើក " .. scriptName .. "...", 3)
 
@@ -165,7 +225,8 @@ local function LoadScript(scriptName, scriptURL)
     end)
 
     if ok then
-        Notify("SP ROBLOX", scriptName .. " ដំណើរការរួចរាល់! ✅", 4)
+        LastLoadedScript = scriptName
+        Notify("SP ROBLOX", scriptName .. " ដំណើរការរួច! ✅", 4)
     else
         Notify("SP ROBLOX ERROR", tostring(err), 6)
         warn("[SP HUB ERROR] " .. tostring(err))
@@ -188,14 +249,14 @@ local function AddScriptCard(tab, name, desc, url, iconFile)
     })
 
     tab:CreateButton({
-        Name = "▶  Execute Script",
+        Name = "▶  EXECUTE  —  បើក Script",
         Callback = function()
             LoadScript(name, url)
         end
     })
 
     tab:CreateButton({
-        Name = "📋  Copy Script",
+        Name = "📋  COPY  —  ចម្លង Script",
         Callback = function()
             CopyLink(name .. " script",
                 'loadstring(game:HttpGet("' .. url .. '"))()')
@@ -210,12 +271,12 @@ end
 local AndroidTab = Window:CreateTab("Android", "smartphone")
 
 AndroidTab:CreateParagraph({
-    Title = "⚡ Version ចុងក្រោយ: " .. VERSION,
-    Content = "ជ្រើសរើស Script ណាមួយខាងក្រោម។ ប្រើ Delta ឬ Executor ដែលស្រដៀងគ្នា។"
+    Title = "⚡ Version: " .. VERSION,
+    Content = "ជ្រើសរើស Script ខាងក្រោម។ ប្រើ Delta ឬ Executor ដែលស្រដៀងគ្នា។"
 })
 
 AddScriptCard(AndroidTab, "🌶️ CHILLI HUB SCRIPT",
-    "សម្រាប់ Android",
+    "សម្រាប់ Android | Popular & Stable",
     "https://raw.githubusercontent.com/tienkhanh1/spicy/main/Chilli.lua", "chilli.png")
 
 AddScriptCard(AndroidTab, "⚡ VENYX HUB",
@@ -223,8 +284,13 @@ AddScriptCard(AndroidTab, "⚡ VENYX HUB",
     "https://raw.githubusercontent.com/tienkhanh1/Venyx/main/VenyxHub", "venyx.png")
 
 AddScriptCard(AndroidTab, "🔵 CODIUMHUB",
-    "សម្រាប់ Android និង iOS | RAM 4GB+",
+    "Android & iOS | RAM 4GB+",
     "https://getcodium.xyz/loader.luau", "codium.png")
+
+-- Special: Egg Finder (Tenshi / NYX)
+AddScriptCard(AndroidTab, "🥚 TENSHI EGG FINDER (NYX)",
+    "Egg Finder + Server Hop រកពងល្អ។ Combo: run ២ ដង។",
+    "https://raw.githubusercontent.com/syss1211/Tenshi-script/main/NYX.lua", nil)
 
 --==================================================
 -- [5] TAB : iOS
@@ -234,15 +300,15 @@ local IOSTab = Window:CreateTab("iOS", "apple")
 
 IOSTab:CreateParagraph({
     Title = "🍎 iOS Scripts",
-    Content = "Script ដែលដំណើរការលើ iPhone / iPad។"
+    Content = "Scripts that work on iPhone / iPad."
 })
 
 AddScriptCard(IOSTab, "💜 SCRIPT FYY",
-    "សម្រាប់ iOS",
+    "For iOS | Optimized",
     "https://FyyCommunity.net", "fyy.png")
 
 AddScriptCard(IOSTab, "🔵 CODIUMHUB",
-    "សម្រាប់ Android និង iOS | RAM 4GB+",
+    "Android & iOS | RAM 4GB+",
     "https://getcodium.xyz/loader.luau", "codium.png")
 
 --==================================================
@@ -254,8 +320,8 @@ local SupportTab = Window:CreateTab("Support", "heart")
 SupportTab:CreateSection("❤ SUPPORT ADMIN")
 
 SupportTab:CreateParagraph({
-    Title = "ជួយឧបត្ថម្ភ Admin 💖",
-    Content = "ជួយឱ្យយើងធ្វើ Link & Script ថ្មីៗបន្ត។ ចំនួនប៉ុន្មានក៏បាន សូមអរគុណ!"
+    Title = "ជួយ Admin 💖",
+    Content = "ជួយឱ្យយើងធ្វើ Link & Script ថ្មីៗ។ ចំនួនប៉ុន្មានក៏បាន សូមអរគុណ!"
 })
 
 SupportTab:CreateButton({
@@ -319,11 +385,30 @@ SettingsTab:CreateSection("UI CONTROL")
 SettingsTab:CreateLabel("Press K to Hide / Show UI", "keyboard")
 
 SettingsTab:CreateKeybind({
-    Name = "Toggle UI Keybind (ប្តូរ​ក្នុង Rayfield Settings)",
+    Name = "Toggle UI Keybind",
     CurrentKeybind = "K",
     HoldToInteract = false,
     Flag = "SP_ToggleInfo",
     Callback = function() end
+})
+
+SettingsTab:CreateSection("SCRIPT CONTROL")
+
+SettingsTab:CreateParagraph({
+    Title = "Unload Script",
+    Content = "ចង់ប្តូរ Script? ចុចប៊ូតុងខាងក្រោមដើម្បីបិទ Script ចាស់សិន (best effort)។"
+})
+
+SettingsTab:CreateButton({
+    Name = "🛑  CLOSE / UNLOAD SCRIPT",
+    Callback = function()
+        local count = CloseLoadedScripts()
+        if count > 0 then
+            Notify("SP ROBLOX", "បានបិទ ~" .. count .. " script UI(s)", 4)
+        else
+            Notify("SP ROBLOX", "រកមិនឃើញ Script UI ផ្សេង (ឬបានបិទរួច)", 4)
+        end
+    end
 })
 
 SettingsTab:CreateSection("CLOSE HUB")
@@ -336,7 +421,7 @@ SettingsTab:CreateButton({
 })
 
 --==================================================
--- [8.1] ដាក់រូប icon លើ card របស់ script នីមួយៗ (fixed)
+-- [8.1] SCRIPT ICONS
 --==================================================
 
 task.spawn(function()
