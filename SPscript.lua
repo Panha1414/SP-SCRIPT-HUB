@@ -1,57 +1,56 @@
 --==================================================
 --       SP ROBLOX SCRIPT HUB PRO
 --       Developer: Sopha Panha
---       UI Library: Rayfield (custom premium theme)
---       Version: Delta-2.745.1142+
+--       UI Library: Rayfield (custom theme)
 --==================================================
 
 local LOGO_ID = 116345727167504
 local VERSION = "Delta-2.745.1142"
 
 --==================================================
--- [1] PREMIUM CUSTOM THEME (dark + cyan/teal + soft purple)
+-- [1] CUSTOM THEME (ដូច website: dark + cyan/green + purple)
 --==================================================
 
 local SPTheme = {
-    TextColor = Color3.fromRGB(240, 245, 255),
+    TextColor = Color3.fromRGB(235, 240, 250),
 
-    Background = Color3.fromRGB(8, 10, 18),
-    Topbar = Color3.fromRGB(12, 15, 26),
+    Background = Color3.fromRGB(9, 12, 20),
+    Topbar = Color3.fromRGB(14, 18, 30),
     Shadow = Color3.fromRGB(0, 0, 0),
 
-    NotificationBackground = Color3.fromRGB(14, 17, 28),
+    NotificationBackground = Color3.fromRGB(14, 18, 30),
     NotificationActionsBackground = Color3.fromRGB(45, 226, 200),
 
-    TabBackground = Color3.fromRGB(15, 18, 30),
-    TabStroke = Color3.fromRGB(40, 48, 72),
+    TabBackground = Color3.fromRGB(17, 22, 36),
+    TabStroke = Color3.fromRGB(34, 42, 64),
     TabBackgroundSelected = Color3.fromRGB(40, 220, 215),
-    TabTextColor = Color3.fromRGB(160, 170, 195),
+    TabTextColor = Color3.fromRGB(165, 175, 200),
     SelectedTabTextColor = Color3.fromRGB(6, 10, 18),
 
-    ElementBackground = Color3.fromRGB(16, 20, 34),
-    ElementBackgroundHover = Color3.fromRGB(28, 26, 52),
-    SecondaryElementBackground = Color3.fromRGB(11, 14, 24),
+    ElementBackground = Color3.fromRGB(16, 21, 34),
+    ElementBackgroundHover = Color3.fromRGB(30, 28, 56),
+    SecondaryElementBackground = Color3.fromRGB(12, 16, 27),
     ElementStroke = Color3.fromRGB(112, 72, 235),
-    SecondaryElementStroke = Color3.fromRGB(45, 52, 78),
+    SecondaryElementStroke = Color3.fromRGB(40, 48, 72),
 
-    SliderBackground = Color3.fromRGB(35, 60, 110),
+    SliderBackground = Color3.fromRGB(40, 70, 120),
     SliderProgress = Color3.fromRGB(45, 226, 200),
     SliderStroke = Color3.fromRGB(80, 240, 210),
 
-    ToggleBackground = Color3.fromRGB(14, 17, 28),
+    ToggleBackground = Color3.fromRGB(14, 18, 30),
     ToggleEnabled = Color3.fromRGB(45, 226, 200),
-    ToggleDisabled = Color3.fromRGB(85, 92, 115),
+    ToggleDisabled = Color3.fromRGB(90, 96, 120),
     ToggleEnabledStroke = Color3.fromRGB(80, 240, 210),
-    ToggleDisabledStroke = Color3.fromRGB(110, 118, 140),
+    ToggleDisabledStroke = Color3.fromRGB(120, 126, 150),
     ToggleEnabledOuterStroke = Color3.fromRGB(112, 72, 235),
-    ToggleDisabledOuterStroke = Color3.fromRGB(45, 50, 72),
+    ToggleDisabledOuterStroke = Color3.fromRGB(50, 56, 80),
 
-    DropdownSelected = Color3.fromRGB(26, 24, 48),
-    DropdownUnselected = Color3.fromRGB(16, 20, 34),
+    DropdownSelected = Color3.fromRGB(28, 26, 52),
+    DropdownUnselected = Color3.fromRGB(16, 21, 34),
 
-    InputBackground = Color3.fromRGB(11, 14, 24),
+    InputBackground = Color3.fromRGB(12, 16, 27),
     InputStroke = Color3.fromRGB(112, 72, 235),
-    PlaceholderColor = Color3.fromRGB(125, 135, 160)
+    PlaceholderColor = Color3.fromRGB(130, 138, 165)
 }
 
 --==================================================
@@ -64,7 +63,7 @@ local Window = Rayfield:CreateWindow({
     Name = "SP ROBLOX SCRIPT HUB",
     Icon = LOGO_ID,
     LoadingTitle = "SP ROBLOX SCRIPT",
-    LoadingSubtitle = "Premium Script Hub  •  By Sopha Panha",
+    LoadingSubtitle = "Premium Script Hub | By Sopha Panha",
     ShowText = "SP HUB",
     Theme = SPTheme,
     ToggleUIKeybind = "K",
@@ -82,13 +81,13 @@ local Window = Rayfield:CreateWindow({
 })
 
 --==================================================
--- [2.1] CUSTOM LOGO (GitHub logo.png)
+-- [2.1] CUSTOM LOGO (ទាញពី GitHub: logo.png)
 --==================================================
 
 local LOGO_URL = "https://raw.githubusercontent.com/Panha1414/SP-SCRIPT-HUB/main/logo.png"
 
 task.spawn(function()
-    task.wait(1.6)
+    task.wait(1.5)
 
     local function Fail(msg)
         warn("[SP LOGO] " .. msg)
@@ -96,7 +95,7 @@ task.spawn(function()
             Rayfield:Notify({
                 Title = "SP LOGO ERROR",
                 Content = msg,
-                Duration = 7
+                Duration = 8
             })
         end)
     end
@@ -107,7 +106,7 @@ task.spawn(function()
 
         local data = game:HttpGet(LOGO_URL)
         if #data < 200 then
-            error("ទាញ logo បរាជ័យ (size=" .. #data .. ")")
+            error("ទាញ logo បរាជ័យ (size=" .. #data .. "): " .. data:sub(1, 40))
         end
 
         writefile("SP_logo.png", data)
@@ -116,26 +115,19 @@ task.spawn(function()
         local root = (gethui and gethui()) or game:GetService("CoreGui")
         local ray = root:FindFirstChild("Rayfield")
         if not ray then
-            for _, c in ipairs({
-                game:GetService("CoreGui"),
-                game:GetService("Players").LocalPlayer:FindFirstChild("PlayerGui")
-            }) do
-                if c and c:FindFirstChild("Rayfield") then
-                    ray = c.Rayfield
-                    break
-                end
+            for _, c in ipairs({game:GetService("CoreGui"), game:GetService("Players").LocalPlayer:FindFirstChild("PlayerGui")}) do
+                if c and c:FindFirstChild("Rayfield") then ray = c.Rayfield break end
             end
         end
         if not ray then error("រកមិនឃើញ Rayfield GUI") end
 
-        local topbar = ray.Main and ray.Main:FindFirstChild("Topbar")
+        local topbar = ray.Main:FindFirstChild("Topbar")
         local icon = topbar and topbar:FindFirstChild("Icon", true)
         if not icon then error("រកមិនឃើញ Icon ក្នុង Topbar") end
 
         icon.Image = asset
         icon.ImageTransparency = 0
         icon.Visible = true
-        icon.Size = UDim2.new(0, 28, 0, 28)
     end)
 
     if not ok then Fail(tostring(err)) end
@@ -149,7 +141,7 @@ local function Notify(title, message, duration)
     Rayfield:Notify({
         Title = title,
         Content = message,
-        Duration = duration or 3.5,
+        Duration = duration or 3,
         Image = LOGO_ID
     })
 end
@@ -180,11 +172,9 @@ local function LoadScript(scriptName, scriptURL)
     end
 end
 
--- Icon list (GitHub)
 local ICON_BASE = "https://raw.githubusercontent.com/Panha1414/SP-SCRIPT-HUB/main/"
-local CardIcons = {} -- { title = "...", file = "xxx.png" }
+local CardIcons = {}
 
--- Beautiful script card
 local function AddScriptCard(tab, name, desc, url, iconFile)
     if iconFile then
         table.insert(CardIcons, { title = name, file = iconFile })
@@ -221,15 +211,15 @@ local AndroidTab = Window:CreateTab("Android", "smartphone")
 
 AndroidTab:CreateParagraph({
     Title = "⚡ Version ចុងក្រោយ: " .. VERSION,
-    Content = "ជ្រើសរើស Script ណាមួយខាងក្រោម។ ប្រើ Delta ឬ Executor ដែលស្រដៀងគ្នា។\nIcon នឹងបង្ហាញនៅខាងស្ដាំនៃ card នីមួយៗ។"
+    Content = "ជ្រើសរើស Script ណាមួយខាងក្រោម។ ប្រើ Delta ឬ Executor ដែលស្រដៀងគ្នា។"
 })
 
 AddScriptCard(AndroidTab, "🌶️ CHILLI HUB SCRIPT",
-    "សម្រាប់ Android • Popular & Stable",
+    "សម្រាប់ Android",
     "https://raw.githubusercontent.com/tienkhanh1/spicy/main/Chilli.lua", "chilli.png")
 
 AddScriptCard(AndroidTab, "⚡ VENYX HUB",
-    "Smoother and faster • High performance",
+    "Smoother and faster",
     "https://raw.githubusercontent.com/tienkhanh1/Venyx/main/VenyxHub", "venyx.png")
 
 AddScriptCard(AndroidTab, "🔵 CODIUMHUB",
@@ -244,11 +234,11 @@ local IOSTab = Window:CreateTab("iOS", "apple")
 
 IOSTab:CreateParagraph({
     Title = "🍎 iOS Scripts",
-    Content = "Script ដែលដំណើរការលើ iPhone / iPad។ Icon នឹងបង្ហាញនៅខាងស្ដាំ។"
+    Content = "Script ដែលដំណើរការលើ iPhone / iPad។"
 })
 
 AddScriptCard(IOSTab, "💜 SCRIPT FYY",
-    "សម្រាប់ iOS • Optimized",
+    "សម្រាប់ iOS",
     "https://FyyCommunity.net", "fyy.png")
 
 AddScriptCard(IOSTab, "🔵 CODIUMHUB",
@@ -269,14 +259,14 @@ SupportTab:CreateParagraph({
 })
 
 SupportTab:CreateButton({
-    Name = "🌐  Website (Donate + Top Supporters)",
+    Name = "🌐 Copy Website (Donate + Top Supporters)",
     Callback = function()
         CopyLink("Website link", "https://sp-roblox.vercel.app")
     end
 })
 
 SupportTab:CreateButton({
-    Name = "✈️  Contact Admin: @sophapanha",
+    Name = "✈️ Contact Admin: @sophapanha",
     Callback = function()
         CopyLink("Telegram link", "https://t.me/sophapanha")
     end
@@ -292,7 +282,7 @@ InfoTab:CreateSection("DEVELOPER")
 
 InfoTab:CreateParagraph({
     Title = "SP ROBLOX SCRIPT",
-    Content = "Developer: Sopha Panha (@sophapanha)\nDownload Apps & Utilities\nPremium Script Hub"
+    Content = "Developer: Sopha Panha (@sophapanha)\nDownload Apps & Utilities"
 })
 
 InfoTab:CreateSection("SOCIAL MEDIA")
@@ -329,7 +319,7 @@ SettingsTab:CreateSection("UI CONTROL")
 SettingsTab:CreateLabel("Press K to Hide / Show UI", "keyboard")
 
 SettingsTab:CreateKeybind({
-    Name = "Toggle UI Keybind",
+    Name = "Toggle UI Keybind (ប្តូរ​ក្នុង Rayfield Settings)",
     CurrentKeybind = "K",
     HoldToInteract = false,
     Flag = "SP_ToggleInfo",
@@ -346,13 +336,13 @@ SettingsTab:CreateButton({
 })
 
 --==================================================
--- [8.1] ROBUST SCRIPT ICONS (find by Title.Text)
+-- [8.1] ដាក់រូប icon លើ card របស់ script នីមួយៗ (fixed)
 --==================================================
 
 task.spawn(function()
-    task.wait(2.2)
+    task.wait(2.5)
     if not (writefile and getcustomasset) then
-        warn("[SP ICON] writefile / getcustomasset not available")
+        warn("[SP ICON] writefile or getcustomasset missing")
         return
     end
 
@@ -378,24 +368,21 @@ task.spawn(function()
     local function getAsset(file)
         if assets[file] then return assets[file] end
         local data = game:HttpGet(ICON_BASE .. file)
-        if #data < 200 then
-            error("ទាញ " .. file .. " មិនបាន (size=" .. #data .. ")")
-        end
+        if #data < 200 then error("download failed: " .. file) end
         local path = "SP_icon_" .. file
         writefile(path, data)
         assets[file] = getcustomasset(path)
         return assets[file]
     end
 
-    local function addIconToParent(parent, asset)
+    local function addIcon(parent, asset)
         if parent:FindFirstChild("SPIcon") then return end
-
         local img = Instance.new("ImageLabel")
         img.Name = "SPIcon"
         img.BackgroundTransparency = 1
         img.AnchorPoint = Vector2.new(1, 0.5)
-        img.Position = UDim2.new(1, -14, 0.5, 0)
-        img.Size = UDim2.new(0, 42, 0, 42)
+        img.Position = UDim2.new(1, -12, 0.5, 0)
+        img.Size = UDim2.new(0, 40, 0, 40)
         img.Image = asset
         img.ScaleType = Enum.ScaleType.Fit
         img.ZIndex = 10
@@ -405,28 +392,53 @@ task.spawn(function()
         corner.CornerRadius = UDim.new(0, 10)
         corner.Parent = img
 
-        -- soft stroke
         local stroke = Instance.new("UIStroke")
         stroke.Color = Color3.fromRGB(45, 226, 200)
         stroke.Thickness = 1.2
-        stroke.Transparency = 0.55
+        stroke.Transparency = 0.5
         stroke.Parent = img
     end
 
     for _, item in ipairs(CardIcons) do
         local ok, err = pcall(function()
             local asset = getAsset(item.file)
+            local target = (item.title or ""):gsub("%s+", " "):match("^%s*(.-)%s*$")
 
-            -- Search every TextLabel whose Text matches the script title
             for _, obj in ipairs(ray.Main:GetDescendants()) do
                 if obj:IsA("TextLabel") and obj.Name == "Title" then
                     local text = (obj.Text or ""):gsub("%s+", " "):match("^%s*(.-)%s*$")
-                    local target = item.title:gsub("%s+", " "):match("^%s*(.-)%s*$")
-
                     if text == target then
-                        -- Prefer the nearest Frame that looks like a card / paragraph / section
                         local parent = obj.Parent
                         while parent and parent ~= ray.Main do
                             if parent:IsA("Frame") then
-                                -- Paragraph / SectionTitle style frames usually have BackgroundTransparency < 1
-                                -- or contain Content / Title
+                                if parent:FindFirstChild("Content")
+                                    or parent:FindFirstChild("Title")
+                                    or (parent.Name and (parent.Name:lower():find("paragraph") or parent.Name:lower():find("section"))) then
+                                    addIcon(parent, asset)
+                                    break
+                                end
+                            end
+                            parent = parent.Parent
+                        end
+                    end
+                end
+            end
+        end)
+        if not ok then
+            warn("[SP ICON] " .. tostring(item.title) .. " -> " .. tostring(err))
+        end
+    end
+    print("[SP HUB] Script icons loaded")
+end)
+
+--==================================================
+-- [9] STARTUP
+--==================================================
+
+Notify("SP ROBLOX SCRIPT HUB", "Welcome! SP HUB PRO Loaded Successfully. 🎉", 6)
+
+print("====================================")
+print("       SP ROBLOX SCRIPT HUB PRO")
+print("       Developer: Sopha Panha")
+print("       Status: Loaded Successfully")
+print("====================================")
