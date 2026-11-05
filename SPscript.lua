@@ -5,8 +5,8 @@
 --   ╚════██║██╔═══╝     ██╔══██║██║   ██║██╔══██╗
 --   ███████║██║         ██║  ██║╚██████╔╝██████╔╝
 --   ╚══════╝╚═╝         ╚═╝  ╚═╝ ╚═════╝ ╚═════╝
---       SP ROBLOX SCRIPT HUB PRO v2.2
---       Key + Sound + Combo + UI Drag Fix
+--       SP ROBLOX SCRIPT HUB PRO v2.3
+--       Key + Sound + Combo + Force UI Reset
 --       Developer: Sopha Panha | UI: Rayfield
 --==================================================
 
@@ -17,13 +17,13 @@ local UIS          = game:GetService("UserInputService")
 
 local LOGO_ID   = 116345727167504
 local VERSION   = "Delta-2.745.1142"
-local BUILD     = "PRO v2.2"
+local BUILD     = "PRO v2.3"
 local ICON_BASE = "https://raw.githubusercontent.com/Panha1414/SP-SCRIPT-HUB/main/"
 
 --===================== BOOT SEQUENCE =====================
 print("╔══════════════════════════════════════════╗")
 print("║  SP ROBLOX SCRIPT HUB " .. BUILD .. "           ║")
-print("║  Key + Sound + Combo + UI Fix            ║")
+print("║  Key + Sound + Combo + Force UI Reset    ║")
 print("║  By Sopha Panha                          ║")
 print("╚══════════════════════════════════════════╝")
 
@@ -266,6 +266,45 @@ local Window = Rayfield:CreateWindow({
         },
     },
 })
+
+--===================== 🛠️ FORCE UI RESET FUNCTION =====================
+local function ResetUIPosition()
+    pcall(function()
+        local Root = (gethui and gethui()) or game:GetService("CoreGui")
+        local RayfieldGui = Root:FindFirstChild("Rayfield")
+        if RayfieldGui then
+            local MainFrame = RayfieldGui:FindFirstChild("Main")
+            if MainFrame and MainFrame:IsA("GuiObject") then
+                -- ទាញ UI មកកណ្តាលអេក្រង់វិញ
+                MainFrame.Position = UDim2.new(0.5, -MainFrame.AbsoluteSize.X / 2, 0.5, -MainFrame.AbsoluteSize.Y / 2)
+                print("[SP HUB] បានកែទីតាំង UI មកកណ្តាលវិញ")
+            end
+        end
+    end)
+end
+
+-- រង់ចាំ ១ វិនាទីឱ្យ UI ដំណើរការ រួចទាញវាមកកណ្តាលភ្លាម
+task.delay(1.5, ResetUIPosition)
+
+-- បន្ថែមការពិនិត្យរាល់ពេលអូស UI បញ្ចប់ (ការពារការអូសបាត់)
+UIS.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        task.wait(0.1)
+        pcall(function()
+            local Root = (gethui and gethui()) or game:GetService("CoreGui")
+            local RayfieldGui = Root:FindFirstChild("Rayfield")
+            if RayfieldGui then
+                local MainFrame = RayfieldGui:FindFirstChild("Main")
+                if MainFrame and MainFrame:IsA("GuiObject") then
+                    -- ប្រសិនបើ UI រុញចេញក្រៅអេក្រង់ខ្លាំងពេក
+                    if MainFrame.AbsolutePosition.Y < -50 or MainFrame.AbsolutePosition.X < -50 then
+                        ResetUIPosition()
+                    end
+                end
+            end
+        end)
+    end
+end)
 
 --===================== HELPERS =====================
 local function Notify(title, content, duration)
@@ -642,9 +681,12 @@ InfoTab:CreateButton({
 local SettingsTab = Window:CreateTab("⚙️ Settings", "settings")
 
 SettingsTab:CreateSection("UI CONTROL")
-SettingsTab:CreateParagraph({
-    Title   = "UI Minimize",
-    Content = "ប្រសិនបើអ្នកចង់បង្រួម UI សូមចុចប៊ូតុងខាងក្រោម (Safe Mode) ដើម្បីការពារការបាត់ UI។",
+SettingsTab:CreateButton({
+    Name = "📌  RESET UI POSITION (ទាញមកកណ្តាល)",
+    Callback = function()
+        ResetUIPosition()
+        Notify("🛠️ Fixed", "UI ត្រូវបានទាញមកកណ្តាលវិញ", 3)
+    end,
 })
 SettingsTab:CreateButton({
     Name = "📌  MINIMIZE UI (Safe Mode)",
@@ -706,34 +748,6 @@ SettingsTab:CreateButton({
     Name = "❌  CLOSE SP ROBLOX HUB",
     Callback = function() Rayfield:Destroy() end,
 })
-
---===================== 🛠️ UI DRAG FIX (ការពារការអូសបាត់) =====================
-local function EnsureUIVisible()
-    pcall(function()
-        local Root = (gethui and gethui()) or game:GetService("CoreGui")
-        local RayfieldGui = Root:FindFirstChild("Rayfield")
-        if RayfieldGui then
-            local MainFrame = RayfieldGui:FindFirstChild("Main")
-            if MainFrame and MainFrame:IsA("GuiObject") then
-                -- ប្រសិនបើ UI រុញចេញក្រៅអេក្រង់
-                if MainFrame.AbsolutePosition.X < -50 or MainFrame.AbsolutePosition.Y < -50 
-                   or MainFrame.AbsolutePosition.X > workspace.CurrentCamera.ViewportSize.X 
-                   or MainFrame.AbsolutePosition.Y > workspace.CurrentCamera.ViewportSize.Y then
-                    -- ទាញវាមកកណ្តាលវិញ
-                    MainFrame.Position = UDim2.new(0.5, -MainFrame.AbsoluteSize.X/2, 0.5, -MainFrame.AbsoluteSize.Y/2)
-                    print("[SP HUB] បានកែទីតាំង UI ឱ្យមកកណ្តាលវិញ")
-                end
-            end
-        end
-    end)
-end
-
-UIS.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        task.wait(0.1) 
-        EnsureUIVisible()
-    end
-end)
 
 --===================== ASYNC LOGO LOADER =====================
 task.spawn(function()
