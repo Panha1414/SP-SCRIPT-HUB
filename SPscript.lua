@@ -4,7 +4,17 @@
 --       UI Library: Rayfield (custom theme)
 --==================================================
 
-local LOGO_ID = 116345727167504
+-- ដាក់ Roblox Image Asset ID នៅទីនេះ (ប្រភេទ Image / PNG)
+-- បើដាក់ 0 មានន័យថាមិនបង្ហាញរូបនោះ
+local ICONS = {
+    logo   = 134486997418064, -- logo ធំ (Window)
+    chilli = 105611933532412,               -- Chilli Hub
+    fyy    = 0,               -- Script FYY
+    venyx  = 139586596764009,               -- Venyx Hub
+    codium = 139160560265409                -- Codiumhub
+}
+
+local LOGO_ID = ICONS.logo
 local VERSION = "Delta-2.745.1142"
 
 --==================================================
@@ -81,60 +91,6 @@ local Window = Rayfield:CreateWindow({
 })
 
 --==================================================
--- [2.1] CUSTOM LOGO (ទាញពី GitHub: logo.png)
---==================================================
-
-local LOGO_URL = "https://raw.githubusercontent.com/Panha1414/SP-SCRIPT-HUB/main/logo.png"
-
-task.spawn(function()
-    task.wait(1.5) -- រង់ចាំឱ្យ Rayfield បង្កើត UI រួច
-
-    local function Fail(msg)
-        warn("[SP LOGO] " .. msg)
-        pcall(function()
-            Rayfield:Notify({
-                Title = "SP LOGO ERROR",
-                Content = msg,
-                Duration = 8
-            })
-        end)
-    end
-
-    local ok, err = pcall(function()
-        if not writefile then error("Executor គ្មាន writefile") end
-        if not getcustomasset then error("Executor គ្មាន getcustomasset") end
-
-        local data = game:HttpGet(LOGO_URL)
-        if #data < 200 then
-            error("ទាញ logo បរាជ័យ (size=" .. #data .. "): " .. data:sub(1, 40))
-        end
-
-        writefile("SP_logo.png", data)
-        local asset = getcustomasset("SP_logo.png")
-
-        local root = (gethui and gethui()) or game:GetService("CoreGui")
-        local ray = root:FindFirstChild("Rayfield")
-        if not ray then
-            -- Rayfield អាចនៅក្នុង container ផ្សេង
-            for _, c in ipairs({game:GetService("CoreGui"), game:GetService("Players").LocalPlayer:FindFirstChild("PlayerGui")}) do
-                if c and c:FindFirstChild("Rayfield") then ray = c.Rayfield break end
-            end
-        end
-        if not ray then error("រកមិនឃើញ Rayfield GUI") end
-
-        local topbar = ray.Main:FindFirstChild("Topbar")
-        local icon = topbar and topbar:FindFirstChild("Icon", true)
-        if not icon then error("រកមិនឃើញ Icon ក្នុង Topbar") end
-
-        icon.Image = asset
-        icon.ImageTransparency = 0
-        icon.Visible = true
-    end)
-
-    if not ok then Fail(tostring(err)) end
-end)
-
---==================================================
 -- [3] HELPERS
 --==================================================
 
@@ -173,14 +129,13 @@ local function LoadScript(scriptName, scriptURL)
     end
 end
 
--- បញ្ជី icon របស់ script នីមួយៗ (ទាញពី GitHub រួចដាក់ក្នុង card)
-local ICON_BASE = "https://raw.githubusercontent.com/Panha1414/SP-SCRIPT-HUB/main/"
+-- បញ្ជី icon របស់ script នីមួយៗ (ប្រើ asset ID ពី ICONS)
 local CardIcons = {}
 
 -- Script "card": ចំណងជើង + ពិពណ៌នា + ប៊ូតុង Execute / Copy (ដូច Copy Script នៅ website)
 local function AddScriptCard(tab, name, desc, url, iconFile)
     if iconFile then
-        table.insert(CardIcons, { title = name, file = iconFile })
+        table.insert(CardIcons, { title = name, key = iconFile })
     end
 
     tab:CreateSection(name)
@@ -219,15 +174,15 @@ AndroidTab:CreateParagraph({
 
 AddScriptCard(AndroidTab, "🌶️ CHILLI HUB SCRIPT",
     "សម្រាប់ Android",
-    "https://raw.githubusercontent.com/tienkhanh1/spicy/main/Chilli.lua", "chilli.png")
+    "https://raw.githubusercontent.com/tienkhanh1/spicy/main/Chilli.lua", "chilli")
 
 AddScriptCard(AndroidTab, "⚡ VENYX HUB",
     "Smoother and faster",
-    "https://raw.githubusercontent.com/tienkhanh1/Venyx/main/VenyxHub", "venyx.png")
+    "https://raw.githubusercontent.com/tienkhanh1/Venyx/main/VenyxHub", "venyx")
 
 AddScriptCard(AndroidTab, "🔵 CODIUMHUB",
     "សម្រាប់ Android និង iOS | RAM 4GB+",
-    "https://getcodium.xyz/loader.luau", "codium.png")
+    "https://getcodium.xyz/loader.luau", "codium")
 
 --==================================================
 -- [5] TAB : iOS
@@ -242,11 +197,11 @@ IOSTab:CreateParagraph({
 
 AddScriptCard(IOSTab, "💜 SCRIPT FYY",
     "សម្រាប់ iOS",
-    "https://FyyCommunity.net", "fyy.png")
+    "https://FyyCommunity.net", "fyy")
 
 AddScriptCard(IOSTab, "🔵 CODIUMHUB",
     "សម្រាប់ Android និង iOS | RAM 4GB+",
-    "https://getcodium.xyz/loader.luau", "codium.png")
+    "https://getcodium.xyz/loader.luau", "codium")
 
 --==================================================
 -- [6] TAB : SUPPORT
@@ -339,50 +294,42 @@ SettingsTab:CreateButton({
 })
 
 --==================================================
--- [8.1] ដាក់រូប icon លើ card របស់ script នីមួយៗ
+-- [8.1] ដាក់រូប icon លើ card របស់ script នីមួយៗ (asset ID)
 --==================================================
 
 task.spawn(function()
     task.wait(2)
-    if not (writefile and getcustomasset) then return end
 
     local root = (gethui and gethui()) or game:GetService("CoreGui")
     local ray = root:FindFirstChild("Rayfield")
     if not ray then return end
 
-    local assets = {}
-
     for _, item in ipairs(CardIcons) do
-        local ok, err = pcall(function()
-            if not assets[item.file] then
-                local data = game:HttpGet(ICON_BASE .. item.file)
-                if #data < 200 then error("ទាញ " .. item.file .. " មិនបាន") end
-                writefile("SP_icon_" .. item.file, data)
-                assets[item.file] = getcustomasset("SP_icon_" .. item.file)
-            end
+        local id = ICONS[item.key]
 
-            for _, obj in ipairs(ray.Main:GetDescendants()) do
-                if obj:IsA("Frame") and obj.Name == item.title
-                    and obj:FindFirstChild("Title") and not obj:FindFirstChild("SPIcon") then
+        if id and id ~= 0 then
+            pcall(function()
+                for _, obj in ipairs(ray.Main:GetDescendants()) do
+                    if obj:IsA("Frame") and obj.Name == item.title
+                        and obj:FindFirstChild("Title") and not obj:FindFirstChild("SPIcon") then
 
-                    local img = Instance.new("ImageLabel")
-                    img.Name = "SPIcon"
-                    img.BackgroundTransparency = 1
-                    img.AnchorPoint = Vector2.new(1, 0.5)
-                    img.Position = UDim2.new(1, -12, 0.5, 0)
-                    img.Size = UDim2.new(0, 40, 0, 40)
-                    img.Image = assets[item.file]
-                    img.ZIndex = 5
-                    img.Parent = obj
+                        local img = Instance.new("ImageLabel")
+                        img.Name = "SPIcon"
+                        img.BackgroundTransparency = 1
+                        img.AnchorPoint = Vector2.new(1, 0.5)
+                        img.Position = UDim2.new(1, -12, 0.5, 0)
+                        img.Size = UDim2.new(0, 40, 0, 40)
+                        img.Image = "rbxassetid://" .. tostring(id)
+                        img.ZIndex = 5
+                        img.Parent = obj
 
-                    local corner = Instance.new("UICorner")
-                    corner.CornerRadius = UDim.new(0, 10)
-                    corner.Parent = img
+                        local corner = Instance.new("UICorner")
+                        corner.CornerRadius = UDim.new(0, 10)
+                        corner.Parent = img
+                    end
                 end
-            end
-        end)
-
-        if not ok then warn("[SP ICON] " .. tostring(err)) end
+            end)
+        end
     end
 end)
 
