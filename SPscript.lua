@@ -5,8 +5,8 @@
 --   ╚════██║██╔═══╝     ██╔══██║██║   ██║██╔══██╗
 --   ███████║██║         ██║  ██║╚██████╔╝██████╔╝
 --   ╚══════╝╚═╝         ╚═╝  ╚═╝ ╚═════╝ ╚═════╝
---       SP ROBLOX SCRIPT HUB PRO v2.4
---       Key + Sound + Combo + Khmer Font
+--       SP ROBLOX SCRIPT HUB PRO v2.5
+--       Key + Sound + Combo + Khmer Font + UI Fix
 --       Developer: Sopha Panha | UI: Rayfield
 --==================================================
 
@@ -17,13 +17,13 @@ local UIS          = game:GetService("UserInputService")
 
 local LOGO_ID   = 116345727167504
 local VERSION   = "Delta-2.745.1142"
-local BUILD     = "PRO v2.4"
+local BUILD     = "PRO v2.5"
 local ICON_BASE = "https://raw.githubusercontent.com/Panha1414/SP-SCRIPT-HUB/main/"
 
 --===================== BOOT SEQUENCE =====================
 print("╔══════════════════════════════════════════╗")
 print("║  SP ROBLOX SCRIPT HUB " .. BUILD .. "           ║")
-print("║  Khmer Font Edition                      ║")
+print("║  Ultimate Edition                        ║")
 print("║  By Sopha Panha                          ║")
 print("╚══════════════════════════════════════════╝")
 
@@ -266,7 +266,7 @@ local Window = Rayfield:CreateWindow({
     },
 })
 
---===================== 🛠️ FORCE UI RESET FUNCTION =====================
+--===================== 🛠️ FORCE UI RESET FUNCTION (FIXED) =====================
 local function ResetUIPosition()
     pcall(function()
         local Root = (gethui and gethui()) or game:GetService("CoreGui")
@@ -274,27 +274,28 @@ local function ResetUIPosition()
         if RayfieldGui then
             local MainFrame = RayfieldGui:FindFirstChild("Main")
             if MainFrame and MainFrame:IsA("GuiObject") then
-                MainFrame.Position = UDim2.new(0.5, -MainFrame.AbsoluteSize.X / 2, 0.5, -MainFrame.AbsoluteSize.Y / 2)
-                print("[SP HUB] បានកែទីតាំង UI មកកណ្តាលវិញ")
+                -- ប្រើ AnchorPoint កណ្តាល ដើម្បីកុំឱ្យវាគិតទំហំខុស
+                MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+                MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+                print("[SP HUB] បានកែទីតាំង UI មកកណ្តាលវិញ (AnchorPoint Fix)")
             end
         end
     end)
 end
 
-task.delay(1.5, ResetUIPosition)
-
-UIS.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        task.wait(0.1)
+-- ពិនិត្យ និងទាញ UI មកកណ្តាលរាល់វិនាទី ប្រសិនបើវារត់ឡើងលើខ្លួនឯង
+task.spawn(function()
+    task.wait(0.5)
+    ResetUIPosition()
+    while task.wait(1) do
         pcall(function()
             local Root = (gethui and gethui()) or game:GetService("CoreGui")
             local RayfieldGui = Root:FindFirstChild("Rayfield")
-            if RayfieldGui then
-                local MainFrame = RayfieldGui:FindFirstChild("Main")
-                if MainFrame and MainFrame:IsA("GuiObject") then
-                    if MainFrame.AbsolutePosition.Y < -50 or MainFrame.AbsolutePosition.X < -50 then
-                        ResetUIPosition()
-                    end
+            if RayfieldGui and RayfieldGui:FindFirstChild("Main") then
+                local MainFrame = RayfieldGui.Main
+                -- បើ UI រត់ទៅលើលើសពី 20 Pixels ឱ្យទាញមកវិញ
+                if MainFrame.Position.Y.Scale < 0.2 or MainFrame.Position.Y.Offset < -20 then
+                    ResetUIPosition()
                 end
             end
         end)
@@ -683,14 +684,6 @@ SettingsTab:CreateButton({
         Notify("🛠️ Fixed", "UI ត្រូវបានទាញមកកណ្តាលវិញ", 3)
     end,
 })
-SettingsTab:CreateButton({
-    Name = "📌  MINIMIZE UI (Safe Mode)",
-    Callback = function()
-        pcall(function()
-            Window:ToggleMinimise()
-        end)
-    end,
-})
 
 --══════════ 🎵 SOUND SETTINGS ══════════
 SettingsTab:CreateSection("🎵 SOUND SETTINGS")
@@ -756,13 +749,8 @@ local function ApplyKhmerFont()
         for _, obj in ipairs(MainFrame:GetDescendants()) do
             if obj:IsA("TextLabel") or obj:IsA("TextButton") or obj:IsA("TextBox") then
                 pcall(function()
-                    -- ប្រើ Font ខ្មែរស្តង់ដាររបស់ Roblox (Siemreap) ដែលអានស្រួល
                     obj.Font = Enum.Font.Siemreap
-                    obj.TextSize = obj.TextSize + 1 -- បង្កើនទំហំអក្សរបន្តិចឱ្យអានងាយ
-                    
-                    -- ⚠️ ប្រសិនបើអ្នកមាន Asset ID របស់ Kantumruy Pro សូមលុប -- ខាងក្រោមចេញ ហើយដាក់ ID របស់អ្នក
-                    -- local fontFace = Font.new("rbxassetid://YOUR_KANTUMRUY_ID_HERE")
-                    -- obj.FontFace = fontFace
+                    obj.TextSize = obj.TextSize + 1
                 end)
             end
         end
@@ -770,7 +758,6 @@ local function ApplyKhmerFont()
     end)
 end
 
--- ពន្យារពេលបន្តិចឱ្យ UI បង្កើតចប់សិន រួចប្តូរ Font
 task.delay(1, ApplyKhmerFont)
 
 --===================== ASYNC LOGO LOADER =====================
