@@ -84,32 +84,54 @@ local Window = Rayfield:CreateWindow({
 -- [2.1] CUSTOM LOGO (ទាញពី GitHub: logo.png)
 --==================================================
 
-local LOGO_URL = "https://raw.githubusercontent.com/Panha1414/SP-SCRIPT-ROBLOX/main/logo.png"
+local LOGO_URL = "https://raw.githubusercontent.com/Panha1414/SP-SCRIPT-HUB/main/logo.png"
 
 task.spawn(function()
+    task.wait(1.5) -- រង់ចាំឱ្យ Rayfield បង្កើត UI រួច
+
+    local function Fail(msg)
+        warn("[SP LOGO] " .. msg)
+        pcall(function()
+            Rayfield:Notify({
+                Title = "SP LOGO ERROR",
+                Content = msg,
+                Duration = 8
+            })
+        end)
+    end
+
     local ok, err = pcall(function()
-        if not (writefile and getcustomasset) then
-            error("Executor មិនគាំទ្រ writefile/getcustomasset")
-        end
+        if not writefile then error("Executor គ្មាន writefile") end
+        if not getcustomasset then error("Executor គ្មាន getcustomasset") end
 
         local data = game:HttpGet(LOGO_URL)
+        if #data < 200 then
+            error("ទាញ logo បរាជ័យ (size=" .. #data .. "): " .. data:sub(1, 40))
+        end
+
         writefile("SP_logo.png", data)
         local asset = getcustomasset("SP_logo.png")
 
         local root = (gethui and gethui()) or game:GetService("CoreGui")
         local ray = root:FindFirstChild("Rayfield")
-        local icon = ray and ray.Main.Topbar:FindFirstChild("Icon")
-
-        if icon then
-            icon.Image = asset
-        else
-            error("រកមិនឃើញ Icon នៅក្នុង Rayfield")
+        if not ray then
+            -- Rayfield អាចនៅក្នុង container ផ្សេង
+            for _, c in ipairs({game:GetService("CoreGui"), game:GetService("Players").LocalPlayer:FindFirstChild("PlayerGui")}) do
+                if c and c:FindFirstChild("Rayfield") then ray = c.Rayfield break end
+            end
         end
+        if not ray then error("រកមិនឃើញ Rayfield GUI") end
+
+        local topbar = ray.Main:FindFirstChild("Topbar")
+        local icon = topbar and topbar:FindFirstChild("Icon", true)
+        if not icon then error("រកមិនឃើញ Icon ក្នុង Topbar") end
+
+        icon.Image = asset
+        icon.ImageTransparency = 0
+        icon.Visible = true
     end)
 
-    if not ok then
-        warn("[SP LOGO] " .. tostring(err))
-    end
+    if not ok then Fail(tostring(err)) end
 end)
 
 --==================================================
