@@ -5,8 +5,8 @@
 --   ╚════██║██╔═══╝     ██╔══██║██║   ██║██╔══██╗
 --   ███████║██║         ██║  ██║╚██████╔╝██████╔╝
 --   ╚══════╝╚═╝         ╚═╝  ╚═╝ ╚═════╝ ╚═════╝
---       SP ROBLOX SCRIPT HUB PRO v2.5
---       Key + Sound + Combo + Khmer Font + UI Fix
+--       SP ROBLOX SCRIPT HUB PRO v2.3
+--       Key + Sound + Combo + Force UI Reset
 --       Developer: Sopha Panha | UI: Rayfield
 --==================================================
 
@@ -17,13 +17,13 @@ local UIS          = game:GetService("UserInputService")
 
 local LOGO_ID   = 116345727167504
 local VERSION   = "Delta-2.745.1142"
-local BUILD     = "PRO v2.5"
+local BUILD     = "PRO v2.3"
 local ICON_BASE = "https://raw.githubusercontent.com/Panha1414/SP-SCRIPT-HUB/main/"
 
 --===================== BOOT SEQUENCE =====================
 print("╔══════════════════════════════════════════╗")
 print("║  SP ROBLOX SCRIPT HUB " .. BUILD .. "           ║")
-print("║  Ultimate Edition                        ║")
+print("║  Key + Sound + Combo + Force UI Reset    ║")
 print("║  By Sopha Panha                          ║")
 print("╚══════════════════════════════════════════╝")
 
@@ -239,6 +239,7 @@ local Window = Rayfield:CreateWindow({
     LoadingSubtitle = "Premium Script Hub " .. BUILD .. " | By Sopha Panha",
     ShowText    = "SP HUB",
     Theme       = SPTheme,
+    -- ToggleUIKeybind = "K", -- 🔕 បិទ Keybind ដើម្បីការពារបញ្ហាអូស UI បាត់
     DisableRayfieldPrompts  = true,
     DisableBuildWarnings    = true,
     ConfigurationSaving = {
@@ -266,7 +267,7 @@ local Window = Rayfield:CreateWindow({
     },
 })
 
---===================== 🛠️ FORCE UI RESET FUNCTION (FIXED) =====================
+--===================== 🛠️ FORCE UI RESET FUNCTION =====================
 local function ResetUIPosition()
     pcall(function()
         local Root = (gethui and gethui()) or game:GetService("CoreGui")
@@ -274,28 +275,31 @@ local function ResetUIPosition()
         if RayfieldGui then
             local MainFrame = RayfieldGui:FindFirstChild("Main")
             if MainFrame and MainFrame:IsA("GuiObject") then
-                -- ប្រើ AnchorPoint កណ្តាល ដើម្បីកុំឱ្យវាគិតទំហំខុស
-                MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-                MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
-                print("[SP HUB] បានកែទីតាំង UI មកកណ្តាលវិញ (AnchorPoint Fix)")
+                -- ទាញ UI មកកណ្តាលអេក្រង់វិញ
+                MainFrame.Position = UDim2.new(0.5, -MainFrame.AbsoluteSize.X / 2, 0.5, -MainFrame.AbsoluteSize.Y / 2)
+                print("[SP HUB] បានកែទីតាំង UI មកកណ្តាលវិញ")
             end
         end
     end)
 end
 
--- ពិនិត្យ និងទាញ UI មកកណ្តាលរាល់វិនាទី ប្រសិនបើវារត់ឡើងលើខ្លួនឯង
-task.spawn(function()
-    task.wait(0.5)
-    ResetUIPosition()
-    while task.wait(1) do
+-- រង់ចាំ ១ វិនាទីឱ្យ UI ដំណើរការ រួចទាញវាមកកណ្តាលភ្លាម
+task.delay(1.5, ResetUIPosition)
+
+-- បន្ថែមការពិនិត្យរាល់ពេលអូស UI បញ្ចប់ (ការពារការអូសបាត់)
+UIS.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        task.wait(0.1)
         pcall(function()
             local Root = (gethui and gethui()) or game:GetService("CoreGui")
             local RayfieldGui = Root:FindFirstChild("Rayfield")
-            if RayfieldGui and RayfieldGui:FindFirstChild("Main") then
-                local MainFrame = RayfieldGui.Main
-                -- បើ UI រត់ទៅលើលើសពី 20 Pixels ឱ្យទាញមកវិញ
-                if MainFrame.Position.Y.Scale < 0.2 or MainFrame.Position.Y.Offset < -20 then
-                    ResetUIPosition()
+            if RayfieldGui then
+                local MainFrame = RayfieldGui:FindFirstChild("Main")
+                if MainFrame and MainFrame:IsA("GuiObject") then
+                    -- ប្រសិនបើ UI រុញចេញក្រៅអេក្រង់ខ្លាំងពេក
+                    if MainFrame.AbsolutePosition.Y < -50 or MainFrame.AbsolutePosition.X < -50 then
+                        ResetUIPosition()
+                    end
                 end
             end
         end)
@@ -684,6 +688,14 @@ SettingsTab:CreateButton({
         Notify("🛠️ Fixed", "UI ត្រូវបានទាញមកកណ្តាលវិញ", 3)
     end,
 })
+SettingsTab:CreateButton({
+    Name = "📌  MINIMIZE UI (Safe Mode)",
+    Callback = function()
+        pcall(function()
+            Window:ToggleMinimise()
+        end)
+    end,
+})
 
 --══════════ 🎵 SOUND SETTINGS ══════════
 SettingsTab:CreateSection("🎵 SOUND SETTINGS")
@@ -736,29 +748,6 @@ SettingsTab:CreateButton({
     Name = "❌  CLOSE SP ROBLOX HUB",
     Callback = function() Rayfield:Destroy() end,
 })
-
---===================== 🔤 APPLY KHMER FONT =====================
-local function ApplyKhmerFont()
-    pcall(function()
-        local Root = (gethui and gethui()) or game:GetService("CoreGui")
-        local RayfieldGui = Root:FindFirstChild("Rayfield")
-        if not RayfieldGui then return end
-        local MainFrame = RayfieldGui:FindFirstChild("Main")
-        if not MainFrame then return end
-
-        for _, obj in ipairs(MainFrame:GetDescendants()) do
-            if obj:IsA("TextLabel") or obj:IsA("TextButton") or obj:IsA("TextBox") then
-                pcall(function()
-                    obj.Font = Enum.Font.Siemreap
-                    obj.TextSize = obj.TextSize + 1
-                end)
-            end
-        end
-        print("[SP HUB] ✓ Khmer Font applied")
-    end)
-end
-
-task.delay(1, ApplyKhmerFont)
 
 --===================== ASYNC LOGO LOADER =====================
 task.spawn(function()
