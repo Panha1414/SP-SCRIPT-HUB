@@ -238,7 +238,7 @@ local Window = Rayfield:CreateWindow({
     LoadingSubtitle = "Premium Script Hub " .. BUILD .. " | By Sopha Panha",
     ShowText    = "SP HUB",
     Theme       = SPTheme,
-    ToggleUIKeybind = "K",
+    ToggleUIKeybind = Enum.KeyCode.Unknown, -- បិទ Keybind បង្គោល
     DisableRayfieldPrompts  = true,
     DisableBuildWarnings    = true,
     ConfigurationSaving = {
@@ -831,6 +831,48 @@ task.spawn(function()
     end
     print("[SP HUB] ✓ Script icons loaded")
 end)
+
+-- ការពារ UI បាត់ទីតាំងពេលអូស
+local UIS = game:GetService("UserInputService")
+
+-- មុខងារសម្រាប់ពិនិត្យ និងកែទីតាំង UI ឱ្យនៅក្នុងអេក្រង់
+local function EnsureUIVisible()
+    pcall(function()
+        -- ស្វែងរក UI របស់ Rayfield
+        local Root = (gethui and gethui()) or game:GetService("CoreGui")
+        local RayfieldGui = Root:FindFirstChild("Rayfield")
+        if RayfieldGui then
+            local MainFrame = RayfieldGui:FindFirstChild("Main")
+            if MainFrame and MainFrame:IsA("GuiObject") then
+                -- ប្រសិនបើទីតាំង X ឬ Y ចេញក្រៅអេក្រង់ (តិចជាង 0 ឬធំជាងទំហំអេក្រង់)
+                if MainFrame.AbsolutePosition.X < 0 or MainFrame.AbsolutePosition.Y < 0 
+                   or MainFrame.AbsolutePosition.X > workspace.CurrentCamera.ViewportSize.X 
+                   or MainFrame.AbsolutePosition.Y > workspace.CurrentCamera.ViewportSize.Y then
+                    -- កំណត់ទីតាំងឱ្យនៅកណ្តាលអេក្រង់វិញ
+                    MainFrame.Position = UDim2.new(0.5, -MainFrame.AbsoluteSize.X/2, 0.5, -MainFrame.AbsoluteSize.Y/2)
+                    print("[SP HUB] បានកែទីតាំង UI ឱ្យមកកណ្តាលវិញ")
+                end
+            end
+        end
+    end)
+end
+
+-- ពិនិត្យរាល់ពេលដែលអ្នកប្រើប្រាស់បញ្ចប់ការអូស (Drag)
+UIS.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        task.wait(0.1) -- រង់ចាំបន្តិចឱ្យ Animation បញ្ចប់
+        EnsureUIVisible()
+    end
+end)
+
+SettingsTab:CreateButton({
+    Name = "📌  Minimize UI (Safe Mode)",
+    Callback = function()
+        pcall(function()
+            Window:ToggleMinimise()
+        end)
+    end,
+})
 
 --===================== WELCOME + STARTUP SOUND =====================
 task.wait(0.3)
