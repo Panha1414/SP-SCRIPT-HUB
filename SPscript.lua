@@ -173,8 +173,16 @@ local function LoadScript(scriptName, scriptURL)
     end
 end
 
+-- បញ្ជី icon របស់ script នីមួយៗ (ទាញពី GitHub រួចដាក់ក្នុង card)
+local ICON_BASE = "https://raw.githubusercontent.com/Panha1414/SP-SCRIPT-HUB/main/"
+local CardIcons = {}
+
 -- Script "card": ចំណងជើង + ពិពណ៌នា + ប៊ូតុង Execute / Copy (ដូច Copy Script នៅ website)
-local function AddScriptCard(tab, name, desc, url)
+local function AddScriptCard(tab, name, desc, url, iconFile)
+    if iconFile then
+        table.insert(CardIcons, { title = name, file = iconFile })
+    end
+
     tab:CreateSection(name)
 
     tab:CreateParagraph({
@@ -211,15 +219,15 @@ AndroidTab:CreateParagraph({
 
 AddScriptCard(AndroidTab, "🌶️ CHILLI HUB SCRIPT",
     "សម្រាប់ Android",
-    "https://raw.githubusercontent.com/tienkhanh1/spicy/main/Chilli.lua")
+    "https://raw.githubusercontent.com/tienkhanh1/spicy/main/Chilli.lua", "chilli.png")
 
 AddScriptCard(AndroidTab, "⚡ VENYX HUB",
     "Smoother and faster",
-    "https://raw.githubusercontent.com/tienkhanh1/Venyx/main/VenyxHub")
+    "https://raw.githubusercontent.com/tienkhanh1/Venyx/main/VenyxHub", "venyx.png")
 
 AddScriptCard(AndroidTab, "🔵 CODIUMHUB",
     "សម្រាប់ Android និង iOS | RAM 4GB+",
-    "https://getcodium.xyz/loader.luau")
+    "https://getcodium.xyz/loader.luau", "codium.png")
 
 --==================================================
 -- [5] TAB : iOS
@@ -234,11 +242,11 @@ IOSTab:CreateParagraph({
 
 AddScriptCard(IOSTab, "💜 SCRIPT FYY",
     "សម្រាប់ iOS",
-    "https://FyyCommunity.net")
+    "https://FyyCommunity.net", "fyy.png")
 
 AddScriptCard(IOSTab, "🔵 CODIUMHUB",
     "សម្រាប់ Android និង iOS | RAM 4GB+",
-    "https://getcodium.xyz/loader.luau")
+    "https://getcodium.xyz/loader.luau", "codium.png")
 
 --==================================================
 -- [6] TAB : SUPPORT
@@ -329,6 +337,54 @@ SettingsTab:CreateButton({
         Rayfield:Destroy()
     end
 })
+
+--==================================================
+-- [8.1] ដាក់រូប icon លើ card របស់ script នីមួយៗ
+--==================================================
+
+task.spawn(function()
+    task.wait(2)
+    if not (writefile and getcustomasset) then return end
+
+    local root = (gethui and gethui()) or game:GetService("CoreGui")
+    local ray = root:FindFirstChild("Rayfield")
+    if not ray then return end
+
+    local assets = {}
+
+    for _, item in ipairs(CardIcons) do
+        local ok, err = pcall(function()
+            if not assets[item.file] then
+                local data = game:HttpGet(ICON_BASE .. item.file)
+                if #data < 200 then error("ទាញ " .. item.file .. " មិនបាន") end
+                writefile("SP_icon_" .. item.file, data)
+                assets[item.file] = getcustomasset("SP_icon_" .. item.file)
+            end
+
+            for _, obj in ipairs(ray.Main:GetDescendants()) do
+                if obj:IsA("Frame") and obj.Name == item.title
+                    and obj:FindFirstChild("Title") and not obj:FindFirstChild("SPIcon") then
+
+                    local img = Instance.new("ImageLabel")
+                    img.Name = "SPIcon"
+                    img.BackgroundTransparency = 1
+                    img.AnchorPoint = Vector2.new(1, 0.5)
+                    img.Position = UDim2.new(1, -12, 0.5, 0)
+                    img.Size = UDim2.new(0, 40, 0, 40)
+                    img.Image = assets[item.file]
+                    img.ZIndex = 5
+                    img.Parent = obj
+
+                    local corner = Instance.new("UICorner")
+                    corner.CornerRadius = UDim.new(0, 10)
+                    corner.Parent = img
+                end
+            end
+        end)
+
+        if not ok then warn("[SP ICON] " .. tostring(err)) end
+    end
+end)
 
 --==================================================
 -- [9] STARTUP
