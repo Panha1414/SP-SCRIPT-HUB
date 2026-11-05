@@ -73,10 +73,10 @@ task.spawn(function()
         end)
     end
     local ok, err = pcall(function()
-        if not writefile then error("Executor គ្មាន writefile") end
-        if not getcustomasset then error("Executor គ្មាន getcustomasset") end
+        if not writefile then error("no writefile") end
+        if not getcustomasset then error("no getcustomasset") end
         local data = game:HttpGet(LOGO_URL)
-        if #data < 200 then error("ទាញ logo បរាជ័យ") end
+        if #data < 200 then error("logo download failed") end
         writefile("SP_logo.png", data)
         local asset = getcustomasset("SP_logo.png")
         local root = (gethui and gethui()) or game:GetService("CoreGui")
@@ -86,10 +86,10 @@ task.spawn(function()
                 if c and c:FindFirstChild("Rayfield") then ray = c.Rayfield break end
             end
         end
-        if not ray then error("រកមិនឃើញ Rayfield GUI") end
+        if not ray then error("Rayfield not found") end
         local topbar = ray.Main:FindFirstChild("Topbar")
         local icon = topbar and topbar:FindFirstChild("Icon", true)
-        if not icon then error("រកមិនឃើញ Icon ក្នុង Topbar") end
+        if not icon then error("Icon not found") end
         icon.Image = asset
         icon.ImageTransparency = 0
         icon.Visible = true
@@ -121,28 +121,70 @@ local function CloseLoadedScripts()
         local lp = game:GetService("Players").LocalPlayer
         if lp then table.insert(roots, lp:FindFirstChild("PlayerGui")) end
     end)
+
+    local keywords = {
+        "rayfield", "fluent", "orchid", "linoria", "venyx", "chilli", "spicy",
+        "codium", "fyy", "hub", "script", "ui", "menu", "window", "library",
+        "nyx", "tenshi", "sirius", "windui", "kavo", "material", "simple",
+        "maclib", "orange", "redz", "lumin", "solara"
+    }
+
+    local function isOurHub(gui)
+        local ok, isOurs = pcall(function()
+            local main = gui:FindFirstChild("Main", true)
+            if not main then return false end
+            local title = main:FindFirstChild("Title", true) or main:FindFirstChildWhichIsA("TextLabel", true)
+            if title and title:IsA("TextLabel") then
+                local t = tostring(title.Text or "")
+                if t:find("SP ROBLOX") or t:find("SP HUB") then return true end
+            end
+            if main:FindFirstChild("SPIcon", true) then return true end
+            return false
+        end)
+        return ok and isOurs
+    end
+
     for _, root in ipairs(roots) do
         if root then
             for _, child in ipairs(root:GetChildren()) do
                 local name = tostring(child.Name):lower()
-                if child.Name ~= "Rayfield" then
-                    if name:find("rayfield") or name:find("fluent") or name:find("orchid") or name:find("linoria")
-                        or name:find("venyx") or name:find("chilli") or name:find("codium") or name:find("fyy")
-                        or name:find("hub") or name:find("script") or name:find("ui") or name:find("menu")
-                        or name:find("window") or name:find("library") or name:find("nyx") or name:find("tenshi") then
-                        pcall(function() child:Destroy() cleaned = cleaned + 1 end)
+                local shouldDestroy = false
+
+                if child.Name == "Rayfield" then
+                    if not isOurHub(child) then shouldDestroy = true end
+                else
+                    for _, kw in ipairs(keywords) do
+                        if name:find(kw) then
+                            shouldDestroy = true
+                            break
+                        end
                     end
+                end
+
+                if shouldDestroy then
+                    pcall(function()
+                        child:Destroy()
+                        cleaned = cleaned + 1
+                    end)
                 end
             end
         end
     end
-    pcall(function() if getgenv then getgenv().SP_Unload = true getgenv().Unload = true end end)
+
+    pcall(function()
+        if getgenv then
+            getgenv().SP_Unload = true
+            getgenv().Unload = true
+            getgenv().ChilliUnload = true
+        end
+    end)
+
     LastLoadedScript = nil
     return cleaned
 end
 
 local function LoadScript(scriptName, scriptURL)
-    Notify("SP ROBLOX", "កំពុងបើក " .. scriptName .. "...", 3)
+    Notify("SP ROBLOX", "Loading " .. scriptName .. "...", 3)
     local ok, err = pcall(function()
         local fn = loadstring(game:HttpGet(scriptURL))
         assert(fn, "Cannot compile script")
@@ -150,7 +192,7 @@ local function LoadScript(scriptName, scriptURL)
     end)
     if ok then
         LastLoadedScript = scriptName
-        Notify("SP ROBLOX", scriptName .. " ដំណើរការរួចរាល់! ✅", 4)
+        Notify("SP ROBLOX", scriptName .. " loaded successfully! ✅", 4)
     else
         Notify("SP ROBLOX ERROR", tostring(err), 6)
         warn("[SP HUB ERROR] " .. tostring(err))
@@ -165,11 +207,11 @@ local function AddScriptCard(tab, name, desc, url, iconFile)
     tab:CreateSection(name)
     tab:CreateParagraph({ Title = name, Content = desc })
     tab:CreateButton({
-        Name = "▶  EXECUTE  —  ចុចដើម្បីបើក Script",
+        Name = "▶  EXECUTE SCRIPT",
         Callback = function() LoadScript(name, url) end
     })
     tab:CreateButton({
-        Name = "📋  COPY  —  ចម្លង Script",
+        Name = "📋  COPY SCRIPT",
         Callback = function()
             CopyLink(name .. " script", 'loadstring(game:HttpGet("' .. url .. '"))()')
         end
@@ -179,35 +221,37 @@ end
 -- ANDROID
 local AndroidTab = Window:CreateTab("Android", "smartphone")
 AndroidTab:CreateParagraph({
-    Title = "⚡ Version ចុងក្រោយ: " .. VERSION,
-    Content = "ជ្រើសរើស Script ណាមួយខាងក្រោម។ ប្រើ Delta ឬ Executor ដែលស្រដៀងគ្នា។"
+    Title = "⚡ Latest Version: " .. VERSION,
+    Content = "Select a script below. Works with Delta and similar executors."
 })
 
-AddScriptCard(AndroidTab, "🌶️ CHILLI HUB SCRIPT", "សម្រាប់ Android",
+AddScriptCard(AndroidTab, "🌶️ CHILLI HUB SCRIPT", "For Android | Popular & Stable",
     "https://raw.githubusercontent.com/tienkhanh1/spicy/main/Chilli.lua", "chilli.png")
 
 AddScriptCard(AndroidTab, "⚡ VENYX HUB", "Smoother and faster",
     "https://raw.githubusercontent.com/tienkhanh1/Venyx/main/VenyxHub", "venyx.png")
 
-AddScriptCard(AndroidTab, "🔵 CODIUMHUB", "សម្រាប់ Android និង iOS | RAM 4GB+",
+AddScriptCard(AndroidTab, "🔵 CODIUMHUB", "Android & iOS | RAM 4GB+",
     "https://getcodium.xyz/loader.luau", "codium.png")
 
--- Special Egg Finder
 AddScriptCard(AndroidTab, "🥚 TENSHI EGG FINDER (NYX)",
-    "Egg Finder + Server Hop រកពងល្អៗ។ បើចង់បាន Combo Finder សូម run script នេះបន្ថែម (ឬ run វាជាលើកទី២)។",
+    "Egg Finder + Server Hop. For Combo Finder, run this script again (2nd time).",
     "https://raw.githubusercontent.com/syss1211/Tenshi-script/main/NYX.lua", nil)
 
 -- iOS
 local IOSTab = Window:CreateTab("iOS", "apple")
-IOSTab:CreateParagraph({ Title = "🍎 iOS Scripts", Content = "Script ដែលដំណើរការលើ iPhone / iPad។" })
+IOSTab:CreateParagraph({ Title = "🍎 iOS Scripts", Content = "Scripts that work on iPhone / iPad." })
 
-AddScriptCard(IOSTab, "💜 SCRIPT FYY", "សម្រាប់ iOS", "https://FyyCommunity.net", "fyy.png")
-AddScriptCard(IOSTab, "🔵 CODIUMHUB", "សម្រាប់ Android និង iOS | RAM 4GB+", "https://getcodium.xyz/loader.luau", "codium.png")
+AddScriptCard(IOSTab, "💜 SCRIPT FYY", "For iOS | Optimized", "https://FyyCommunity.net", "fyy.png")
+AddScriptCard(IOSTab, "🔵 CODIUMHUB", "Android & iOS | RAM 4GB+", "https://getcodium.xyz/loader.luau", "codium.png")
 
 -- SUPPORT
 local SupportTab = Window:CreateTab("Support", "heart")
 SupportTab:CreateSection("❤ SUPPORT ADMIN")
-SupportTab:CreateParagraph({ Title = "ជួយឧបត្ថម្ភ Admin 💖", Content = "ជួយឱ្យយើងធ្វើ Link & Script ថ្មីៗបន្ត។ ចំនួនប៉ុន្មានក៏បាន សូមអរគុណ!" })
+SupportTab:CreateParagraph({
+    Title = "Support the Admin 💖",
+    Content = "Help us keep making new links & scripts. Any amount is appreciated. Thank you!"
+})
 SupportTab:CreateButton({ Name = "🌐 Copy Website (Donate + Top Supporters)", Callback = function() CopyLink("Website link", "https://sp-roblox.vercel.app") end })
 SupportTab:CreateButton({ Name = "✈️ Contact Admin: @sophapanha", Callback = function() CopyLink("Telegram link", "https://t.me/sophapanha") end })
 
@@ -227,15 +271,18 @@ SettingsTab:CreateLabel("Press K to Hide / Show UI", "keyboard")
 SettingsTab:CreateKeybind({ Name = "Toggle UI Keybind", CurrentKeybind = "K", HoldToInteract = false, Flag = "SP_ToggleInfo", Callback = function() end })
 
 SettingsTab:CreateSection("SCRIPT CONTROL")
-SettingsTab:CreateParagraph({ Title = "Unload Script", Content = "បើអ្នកចង់ប្តូរ Script ថ្មី សូមចុចប៊ូតុងខាងក្រោមដើម្បីបិទ Script ចាស់សិន (best effort)." })
+SettingsTab:CreateParagraph({
+    Title = "Unload Script",
+    Content = "Want to switch script? Click the button below to close the current one first (best effort)."
+})
 SettingsTab:CreateButton({
     Name = "🛑  CLOSE / UNLOAD SCRIPT",
     Callback = function()
         local count = CloseLoadedScripts()
         if count > 0 then
-            Notify("SP ROBLOX", "បានបិទ Script ប្រហែល " .. count .. " UI(s)", 4)
+            Notify("SP ROBLOX", "Closed ~" .. count .. " script UI(s)", 4)
         else
-            Notify("SP ROBLOX", "រកមិនឃើញ Script UI ផ្សេង (ឬបានបិទរួច)", 4)
+            Notify("SP ROBLOX", "No other script UI found (or already closed)", 4)
         end
     end
 })
