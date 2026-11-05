@@ -5,23 +5,25 @@
 --   ╚════██║██╔═══╝     ██╔══██║██║   ██║██╔══██╗
 --   ███████║██║         ██║  ██║╚██████╔╝██████╔╝
 --   ╚══════╝╚═╝         ╚═╝  ╚═╝ ╚═════╝ ╚═════╝
---       SP ROBLOX SCRIPT HUB PRO v2.0
---       Enhanced Edition | Developer: Sopha Panha
---       UI Library: Rayfield (custom theme)
+--       SP ROBLOX SCRIPT HUB PRO v2.1
+--       Key System + Sound + Combo Edition
+--       Developer: Sopha Panha | UI: Rayfield
 --==================================================
 
-local HttpService = game:GetService("HttpService")
-local Players     = game:GetService("Players")
+local HttpService  = game:GetService("HttpService")
+local Players      = game:GetService("Players")
+local SoundService = game:GetService("SoundService")
 
 local LOGO_ID   = 116345727167504
 local VERSION   = "Delta-2.745.1142"
-local BUILD     = "PRO v2.0"
+local BUILD     = "PRO v2.1"
 local ICON_BASE = "https://raw.githubusercontent.com/Panha1414/SP-SCRIPT-HUB/main/"
 
 --===================== BOOT SEQUENCE =====================
 print("╔══════════════════════════════════════════╗")
-print("║  SP ROBLOX SCRIPT HUB PRO v2.0           ║")
-print("║  Enhanced Edition | By Sopha Panha       ║")
+print("║  SP ROBLOX SCRIPT HUB " .. BUILD .. "           ║")
+print("║  Key System + Sound + Combo              ║")
+print("║  By Sopha Panha                          ║")
 print("╚══════════════════════════════════════════╝")
 
 for i, step in ipairs({
@@ -37,37 +39,37 @@ end
 
 --===================== THEME =====================
 local SPTheme = {
-    TextColor                    = Color3.fromRGB(235, 240, 250),
-    Background                   = Color3.fromRGB(9, 12, 20),
-    Topbar                       = Color3.fromRGB(14, 18, 30),
-    Shadow                       = Color3.fromRGB(0, 0, 0),
-    NotificationBackground       = Color3.fromRGB(14, 18, 30),
-    NotificationActionsBackground= Color3.fromRGB(45, 226, 200),
-    TabBackground                = Color3.fromRGB(17, 22, 36),
-    TabStroke                    = Color3.fromRGB(34, 42, 64),
-    TabBackgroundSelected        = Color3.fromRGB(40, 220, 215),
-    TabTextColor                 = Color3.fromRGB(165, 175, 200),
-    SelectedTabTextColor         = Color3.fromRGB(6, 10, 18),
-    ElementBackground            = Color3.fromRGB(16, 21, 34),
-    ElementBackgroundHover       = Color3.fromRGB(30, 28, 56),
-    SecondaryElementBackground   = Color3.fromRGB(12, 16, 27),
-    ElementStroke                = Color3.fromRGB(112, 72, 235),
-    SecondaryElementStroke       = Color3.fromRGB(40, 48, 72),
-    SliderBackground             = Color3.fromRGB(40, 70, 120),
-    SliderProgress               = Color3.fromRGB(45, 226, 200),
-    SliderStroke                 = Color3.fromRGB(80, 240, 210),
-    ToggleBackground             = Color3.fromRGB(14, 18, 30),
-    ToggleEnabled                = Color3.fromRGB(45, 226, 200),
-    ToggleDisabled               = Color3.fromRGB(90, 96, 120),
-    ToggleEnabledStroke          = Color3.fromRGB(80, 240, 210),
-    ToggleDisabledStroke         = Color3.fromRGB(120, 126, 150),
-    ToggleEnabledOuterStroke     = Color3.fromRGB(112, 72, 235),
-    ToggleDisabledOuterStroke    = Color3.fromRGB(50, 56, 80),
-    DropdownSelected             = Color3.fromRGB(28, 26, 52),
-    DropdownUnselected           = Color3.fromRGB(16, 21, 34),
-    InputBackground              = Color3.fromRGB(12, 16, 27),
-    InputStroke                  = Color3.fromRGB(112, 72, 235),
-    PlaceholderColor             = Color3.fromRGB(130, 138, 165),
+    TextColor                     = Color3.fromRGB(235, 240, 250),
+    Background                    = Color3.fromRGB(9, 12, 20),
+    Topbar                        = Color3.fromRGB(14, 18, 30),
+    Shadow                        = Color3.fromRGB(0, 0, 0),
+    NotificationBackground        = Color3.fromRGB(14, 18, 30),
+    NotificationActionsBackground = Color3.fromRGB(45, 226, 200),
+    TabBackground                 = Color3.fromRGB(17, 22, 36),
+    TabStroke                     = Color3.fromRGB(34, 42, 64),
+    TabBackgroundSelected         = Color3.fromRGB(40, 220, 215),
+    TabTextColor                  = Color3.fromRGB(165, 175, 200),
+    SelectedTabTextColor          = Color3.fromRGB(6, 10, 18),
+    ElementBackground             = Color3.fromRGB(16, 21, 34),
+    ElementBackgroundHover        = Color3.fromRGB(30, 28, 56),
+    SecondaryElementBackground    = Color3.fromRGB(12, 16, 27),
+    ElementStroke                 = Color3.fromRGB(112, 72, 235),
+    SecondaryElementStroke        = Color3.fromRGB(40, 48, 72),
+    SliderBackground              = Color3.fromRGB(40, 70, 120),
+    SliderProgress                = Color3.fromRGB(45, 226, 200),
+    SliderStroke                  = Color3.fromRGB(80, 240, 210),
+    ToggleBackground              = Color3.fromRGB(14, 18, 30),
+    ToggleEnabled                 = Color3.fromRGB(45, 226, 200),
+    ToggleDisabled                = Color3.fromRGB(90, 96, 120),
+    ToggleEnabledStroke           = Color3.fromRGB(80, 240, 210),
+    ToggleDisabledStroke          = Color3.fromRGB(120, 126, 150),
+    ToggleEnabledOuterStroke      = Color3.fromRGB(112, 72, 235),
+    ToggleDisabledOuterStroke     = Color3.fromRGB(50, 56, 80),
+    DropdownSelected              = Color3.fromRGB(28, 26, 52),
+    DropdownUnselected            = Color3.fromRGB(16, 21, 34),
+    InputBackground               = Color3.fromRGB(12, 16, 27),
+    InputStroke                   = Color3.fromRGB(112, 72, 235),
+    PlaceholderColor              = Color3.fromRGB(130, 138, 165),
 }
 
 --===================== PERSISTENCE =====================
@@ -106,8 +108,37 @@ local function SaveFavorites() WriteJSON(FAV_FILE,    SP.Favorites) end
 local function SaveRecent()    WriteJSON(RECENT_FILE, SP.Recent)    end
 local function SaveStats()     WriteJSON(STATS_FILE,  SP.Stats)     end
 
+--===================== 🎵 SOUND SYSTEM =====================
+local SOUNDS = {
+    startup = "rbxassetid://1837727675",
+    success = "rbxassetid://9118823103",
+    error   = "rbxassetid://9118823302",
+    click   = "rbxassetid://6042053626",
+    copy    = "rbxassetid://9118823103",
+    combo   = "rbxassetid://9046892591",
+    fav     = "rbxassetid://9046892591",
+}
+
+local SOUND_ENABLED = true
+local SOUND_VOLUME  = 0.4
+
+local function PlaySound(name, volume)
+    if not SOUND_ENABLED then return end
+    local id = SOUNDS[name]
+    if not id then return end
+    pcall(function()
+        local sound = Instance.new("Sound")
+        sound.SoundId = id
+        sound.Volume  = volume or SOUND_VOLUME
+        sound.Parent  = SoundService
+        sound:Play()
+        task.delay(6, function()
+            if sound and sound.Parent then sound:Destroy() end
+        end)
+    end)
+end
+
 --===================== SCRIPT REGISTRY =====================
--- បន្ថែម Script ថ្មីៗនៅទីនេះ — UI នឹងបង្កើតដោយស្វ័យប្រវត្តិ
 local SCRIPT_REGISTRY = {
     -- ============ ANDROID ============
     {
@@ -137,10 +168,24 @@ local SCRIPT_REGISTRY = {
     {
         id   = "tenshi",
         name = "🥚 TENSHI EGG FINDER (NYX)",
-        desc = "Egg Finder + Server Hop រកពងល្អៗ។ បើចង់បាន Combo Finder សូម run script នេះបន្ថែម (ឬ run ជាលើកទី២)។",
+        desc = "Egg Finder + Server Hop រកពងល្អៗ។ បើចង់បាន Combo Finder សូម run script នេះបន្ថែម។",
         url  = "https://raw.githubusercontent.com/syss1211/Tenshi-script/main/NYX.lua",
         icon = nil,
         cat  = "Android",
+    },
+
+    -- ============ 🔥 COMBO ============
+    {
+        id    = "venyx_tenshi_combo",
+        name  = "🔥 VENYX + TENSHI COMBO",
+        desc  = "បើក Venyx Hub និង Tenshi Egg Finder (NYX) ព្រមគ្នាក្នុងពេលតែមួយ! ចុចតែម្តងបានទាំង២ 🚀",
+        url   = nil,
+        combo = {
+            { name = "VENYX HUB",         url = "https://raw.githubusercontent.com/tienkhanh1/Venyx/main/VenyxHub" },
+            { name = "TENSHI EGG FINDER", url = "https://raw.githubusercontent.com/syss1211/Tenshi-script/main/NYX.lua" },
+        },
+        icon  = "venyx.png",
+        cat   = "Android",
     },
 
     -- ============ iOS ============
@@ -183,14 +228,14 @@ local function CountFavorites()
     return n
 end
 
---===================== WINDOW =====================
+--===================== WINDOW (with KEY SYSTEM) =====================
 local Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
 
 local Window = Rayfield:CreateWindow({
     Name        = "SP ROBLOX SCRIPT HUB",
     Icon        = LOGO_ID,
     LoadingTitle    = "SP ROBLOX SCRIPT",
-    LoadingSubtitle = "Premium Script Hub v2.0 | By Sopha Panha",
+    LoadingSubtitle = "Premium Script Hub " .. BUILD .. " | By Sopha Panha",
     ShowText    = "SP HUB",
     Theme       = SPTheme,
     ToggleUIKeybind = "K",
@@ -202,7 +247,23 @@ local Window = Rayfield:CreateWindow({
         FileName   = "SP_Hub",
     },
     Discord = { Enabled = false, Invite = "SPROBLOX", RememberJoins = true },
-    KeySystem = false,
+
+    --══════════════════ 🔒 KEY SYSTEM ══════════════════
+    KeySystem = true,
+    KeySettings = {
+        Title     = "SP HUB | 🔑 KEY SYSTEM",
+        Subtitle  = "Enter your key to unlock SP HUB",
+        Note      = "🔑 Get your key: t.me/SPROBLOX\n🌐 Or visit: sp-roblox.vercel.app",
+        FileName  = "SP_Hub_Key",
+        SaveKey   = true,
+        GrabKeyFromSite = false,
+        Key = {
+            "SP-2024-PREMIUM",
+            "SP-VIP-GOLD",
+            "SP-DEV-MASTER",
+            "SP-BETA-ACCESS",
+        },
+    },
 })
 
 --===================== HELPERS =====================
@@ -218,6 +279,7 @@ local function Notify(title, content, duration)
 end
 
 local function CopyLink(label, link)
+    PlaySound("copy")
     if setclipboard then
         setclipboard(link)
         Notify("📋 Copied", label .. " copied to clipboard!", 3)
@@ -226,10 +288,54 @@ local function CopyLink(label, link)
     end
 end
 
+--===================== LOAD SCRIPT (WITH COMBO SUPPORT) =====================
 local function LoadScript(script)
     if not script then return end
-    Notify("⏳ Loading", script.name .. "...", 3)
 
+    --═══════════ 🔥 COMBO MODE ═══════════
+    if script.combo then
+        Notify("🔥 Combo", "កំពុងបើក " .. #script.combo .. " scripts ព្រមគ្នា...", 3)
+        local success = 0
+
+        for i, sub in ipairs(script.combo) do
+            Notify("⏳ " .. i .. "/" .. #script.combo, sub.name .. " loading...", 2)
+            local ok, err = pcall(function()
+                local src = game:HttpGet(sub.url)
+                assert(type(src) == "string" and #src > 50, "Empty source")
+                local fn = loadstring(src)
+                assert(fn, "Failed to compile " .. sub.name)
+                fn()
+            end)
+            if ok then
+                success = success + 1
+                print("[SP HUB] ✓ Combo part: " .. sub.name)
+            else
+                Notify("❌ Combo Failed", sub.name .. ": " .. tostring(err), 5)
+                PlaySound("error")
+            end
+            if i < #script.combo then task.wait(1.2) end
+        end
+
+        if success > 0 then
+            SP.Stats.loaded = SP.Stats.loaded + success
+            SaveStats()
+            for i = #SP.Recent, 1, -1 do
+                if SP.Recent[i].id == script.id then table.remove(SP.Recent, i) end
+            end
+            table.insert(SP.Recent, 1, { id = script.id, name = script.name, time = os.time() })
+            while #SP.Recent > 5 do table.remove(SP.Recent) end
+            SaveRecent()
+            PlaySound("combo", 0.55)
+            Notify("🔥 Combo Success", success .. "/" .. #script.combo .. " scripts loaded!", 5)
+        else
+            SP.Stats.failed = SP.Stats.failed + 1
+            SaveStats()
+        end
+        return
+    end
+
+    --═══════════ SINGLE SCRIPT MODE ═══════════
+    Notify("⏳ Loading", script.name .. "...", 3)
     local ok, err = false, nil
     for attempt = 1, 2 do
         ok, err = pcall(function()
@@ -246,25 +352,25 @@ local function LoadScript(script)
     if ok then
         SP.Stats.loaded = SP.Stats.loaded + 1
         SaveStats()
-
-        -- Add to Recent (max 5)
         for i = #SP.Recent, 1, -1 do
             if SP.Recent[i].id == script.id then table.remove(SP.Recent, i) end
         end
         table.insert(SP.Recent, 1, { id = script.id, name = script.name, time = os.time() })
         while #SP.Recent > 5 do table.remove(SP.Recent) end
         SaveRecent()
-
+        PlaySound("success")
         Notify("✅ Success", script.name .. " loaded successfully!", 4)
         print("[SP HUB] ✓ Loaded: " .. script.name)
     else
         SP.Stats.failed = SP.Stats.failed + 1
         SaveStats()
+        PlaySound("error")
         Notify("❌ Failed", script.name .. "\n" .. tostring(err), 6)
         warn("[SP HUB] ✗ Failed: " .. tostring(err))
     end
 end
 
+--===================== UNLOAD =====================
 local function CloseLoadedScripts()
     local cleaned = 0
     local roots = {}
@@ -328,17 +434,22 @@ local function BuildScriptCard(tab, script)
 
     tab:CreateButton({
         Name = "▶  EXECUTE — ចុចដើម្បីបើក Script",
-        Callback = function() LoadScript(script) end,
-    })
-
-    tab:CreateButton({
-        Name = "📋  COPY — ចម្លង Script",
         Callback = function()
-            SP.Stats.copied = SP.Stats.copied + 1
-            SaveStats()
-            CopyLink(script.name, 'loadstring(game:HttpGet("' .. script.url .. '"))()')
+            PlaySound("click")
+            LoadScript(script)
         end,
     })
+
+    if script.url then
+        tab:CreateButton({
+            Name = "📋  COPY — ចម្លង Script",
+            Callback = function()
+                SP.Stats.copied = SP.Stats.copied + 1
+                SaveStats()
+                CopyLink(script.name, 'loadstring(game:HttpGet("' .. script.url .. '"))()')
+            end,
+        })
+    end
 
     tab:CreateToggle({
         Name         = "⭐ Favorite — ដាក់ក្នុង Favorites",
@@ -346,6 +457,7 @@ local function BuildScriptCard(tab, script)
         Callback = function(value)
             if value then
                 SP.Favorites[script.id] = true
+                PlaySound("fav")
                 Notify("⭐ Added", script.name .. " ដាក់ក្នុង Favorites", 2)
             else
                 SP.Favorites[script.id] = nil
@@ -391,6 +503,7 @@ HomeTab:CreateButton({
             Notify("⚠️ No Selection", "សូមជ្រើសរើស script មុនសិន", 3)
             return
         end
+        PlaySound("click")
         local script = FindScriptByName(quickSelected)
         if script then LoadScript(script) end
     end,
@@ -404,7 +517,7 @@ HomeTab:CreateButton({
             return
         end
         local script = FindScriptByName(quickSelected)
-        if script then
+        if script and script.url then
             SP.Stats.copied = SP.Stats.copied + 1
             SaveStats()
             CopyLink(script.name, 'loadstring(game:HttpGet("' .. script.url .. '"))()')
@@ -530,6 +643,7 @@ InfoTab:CreateButton({
 
 --===================== SETTINGS TAB =====================
 local SettingsTab = Window:CreateTab("⚙️ Settings", "settings")
+
 SettingsTab:CreateSection("UI CONTROL")
 SettingsTab:CreateLabel("Press K to Hide / Show UI", "keyboard")
 SettingsTab:CreateKeybind({
@@ -540,6 +654,35 @@ SettingsTab:CreateKeybind({
     Callback       = function() end,
 })
 
+--══════════ 🎵 SOUND SETTINGS ══════════
+SettingsTab:CreateSection("🎵 SOUND SETTINGS")
+SettingsTab:CreateToggle({
+    Name         = "Enable Sound Effects",
+    CurrentValue = true,
+    Flag         = "SP_SoundEnabled",
+    Callback = function(value)
+        SOUND_ENABLED = value
+        if value then PlaySound("click") end
+        Notify("🔊 Sound", value and "ដំណើរការ" or "បិទ", 2)
+    end,
+})
+
+--══════════ 🔒 KEY SYSTEM ══════════
+SettingsTab:CreateSection("🔒 KEY SYSTEM")
+SettingsTab:CreateButton({
+    Name = "🚪  LOGOUT — Clear Saved Key",
+    Callback = function()
+        local keyPath = CONFIG_FOLDER .. "/SP_Hub_Key.json"
+        pcall(function()
+            if delfile and isfile and isfile(keyPath) then
+                delfile(keyPath)
+            end
+        end)
+        Notify("🚪 Logged Out", "Key cleared. Restart hub to enter new key.", 4)
+    end,
+})
+
+--══════════ SCRIPT CONTROL ══════════
 SettingsTab:CreateSection("SCRIPT CONTROL")
 SettingsTab:CreateParagraph({
     Title   = "Unload Script",
@@ -592,9 +735,9 @@ task.spawn(function()
         local topbar = ray.Main:FindFirstChild("Topbar")
         local icon   = topbar and topbar:FindFirstChild("Icon", true)
         if not icon then error("រកមិនឃើញ Icon ក្នុង Topbar") end
-        icon.Image            = asset
+        icon.Image             = asset
         icon.ImageTransparency = 0
-        icon.Visible          = true
+        icon.Visible           = true
     end)
     if ok then
         print("[SP HUB] ✓ Logo loaded")
@@ -636,15 +779,15 @@ task.spawn(function()
     local function addIcon(parent, asset)
         if parent:FindFirstChild("SPIcon") then return end
         local img = Instance.new("ImageLabel")
-        img.Name                  = "SPIcon"
+        img.Name                   = "SPIcon"
         img.BackgroundTransparency = 1
-        img.AnchorPoint           = Vector2.new(1, 0.5)
-        img.Position              = UDim2.new(1, -12, 0.5, 0)
-        img.Size                  = UDim2.new(0, 40, 0, 40)
-        img.Image                 = asset
-        img.ScaleType             = Enum.ScaleType.Fit
-        img.ZIndex                = 10
-        img.Parent                = parent
+        img.AnchorPoint            = Vector2.new(1, 0.5)
+        img.Position               = UDim2.new(1, -12, 0.5, 0)
+        img.Size                   = UDim2.new(0, 40, 0, 40)
+        img.Image                  = asset
+        img.ScaleType              = Enum.ScaleType.Fit
+        img.ZIndex                 = 10
+        img.Parent                 = parent
 
         local corner = Instance.new("UICorner")
         corner.CornerRadius = UDim.new(0, 10)
@@ -689,10 +832,12 @@ task.spawn(function()
     print("[SP HUB] ✓ Script icons loaded")
 end)
 
---===================== WELCOME =====================
+--===================== WELCOME + STARTUP SOUND =====================
 task.wait(0.3)
+PlaySound("startup", 0.5)
+
 Notify("🎉 SP ROBLOX HUB " .. BUILD,
-    "Welcome! Loaded in " .. string.format("%.1f", 0.08 * 5) .. "s.\nFavorites: " .. CountFavorites() .. " | Version: " .. VERSION,
+    "Welcome!\nFavorites: " .. CountFavorites() .. " | Version: " .. VERSION,
     6)
 
 print("╔══════════════════════════════════════════╗")
