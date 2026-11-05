@@ -5,8 +5,8 @@
 --   ╚════██║██╔═══╝     ██╔══██║██║   ██║██╔══██╗
 --   ███████║██║         ██║  ██║╚██████╔╝██████╔╝
 --   ╚══════╝╚═╝         ╚═╝  ╚═╝ ╚═════╝ ╚═════╝
---       SP ROBLOX SCRIPT HUB PRO v2.3
---       Key + Sound + Combo + Force UI Reset
+--       SP ROBLOX SCRIPT HUB PRO v2.4
+--       Key + Sound + Combo + Khmer Font
 --       Developer: Sopha Panha | UI: Rayfield
 --==================================================
 
@@ -17,13 +17,13 @@ local UIS          = game:GetService("UserInputService")
 
 local LOGO_ID   = 116345727167504
 local VERSION   = "Delta-2.745.1142"
-local BUILD     = "PRO v2.3"
+local BUILD     = "PRO v2.4"
 local ICON_BASE = "https://raw.githubusercontent.com/Panha1414/SP-SCRIPT-HUB/main/"
 
 --===================== BOOT SEQUENCE =====================
 print("╔══════════════════════════════════════════╗")
 print("║  SP ROBLOX SCRIPT HUB " .. BUILD .. "           ║")
-print("║  Key + Sound + Combo + Force UI Reset    ║")
+print("║  Khmer Font Edition                      ║")
 print("║  By Sopha Panha                          ║")
 print("╚══════════════════════════════════════════╝")
 
@@ -239,7 +239,6 @@ local Window = Rayfield:CreateWindow({
     LoadingSubtitle = "Premium Script Hub " .. BUILD .. " | By Sopha Panha",
     ShowText    = "SP HUB",
     Theme       = SPTheme,
-    -- ToggleUIKeybind = "K", -- 🔕 បិទ Keybind ដើម្បីការពារបញ្ហាអូស UI បាត់
     DisableRayfieldPrompts  = true,
     DisableBuildWarnings    = true,
     ConfigurationSaving = {
@@ -275,7 +274,6 @@ local function ResetUIPosition()
         if RayfieldGui then
             local MainFrame = RayfieldGui:FindFirstChild("Main")
             if MainFrame and MainFrame:IsA("GuiObject") then
-                -- ទាញ UI មកកណ្តាលអេក្រង់វិញ
                 MainFrame.Position = UDim2.new(0.5, -MainFrame.AbsoluteSize.X / 2, 0.5, -MainFrame.AbsoluteSize.Y / 2)
                 print("[SP HUB] បានកែទីតាំង UI មកកណ្តាលវិញ")
             end
@@ -283,10 +281,8 @@ local function ResetUIPosition()
     end)
 end
 
--- រង់ចាំ ១ វិនាទីឱ្យ UI ដំណើរការ រួចទាញវាមកកណ្តាលភ្លាម
 task.delay(1.5, ResetUIPosition)
 
--- បន្ថែមការពិនិត្យរាល់ពេលអូស UI បញ្ចប់ (ការពារការអូសបាត់)
 UIS.InputEnded:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
         task.wait(0.1)
@@ -296,7 +292,6 @@ UIS.InputEnded:Connect(function(input)
             if RayfieldGui then
                 local MainFrame = RayfieldGui:FindFirstChild("Main")
                 if MainFrame and MainFrame:IsA("GuiObject") then
-                    -- ប្រសិនបើ UI រុញចេញក្រៅអេក្រង់ខ្លាំងពេក
                     if MainFrame.AbsolutePosition.Y < -50 or MainFrame.AbsolutePosition.X < -50 then
                         ResetUIPosition()
                     end
@@ -748,6 +743,35 @@ SettingsTab:CreateButton({
     Name = "❌  CLOSE SP ROBLOX HUB",
     Callback = function() Rayfield:Destroy() end,
 })
+
+--===================== 🔤 APPLY KHMER FONT =====================
+local function ApplyKhmerFont()
+    pcall(function()
+        local Root = (gethui and gethui()) or game:GetService("CoreGui")
+        local RayfieldGui = Root:FindFirstChild("Rayfield")
+        if not RayfieldGui then return end
+        local MainFrame = RayfieldGui:FindFirstChild("Main")
+        if not MainFrame then return end
+
+        for _, obj in ipairs(MainFrame:GetDescendants()) do
+            if obj:IsA("TextLabel") or obj:IsA("TextButton") or obj:IsA("TextBox") then
+                pcall(function()
+                    -- ប្រើ Font ខ្មែរស្តង់ដាររបស់ Roblox (Siemreap) ដែលអានស្រួល
+                    obj.Font = Enum.Font.Siemreap
+                    obj.TextSize = obj.TextSize + 1 -- បង្កើនទំហំអក្សរបន្តិចឱ្យអានងាយ
+                    
+                    -- ⚠️ ប្រសិនបើអ្នកមាន Asset ID របស់ Kantumruy Pro សូមលុប -- ខាងក្រោមចេញ ហើយដាក់ ID របស់អ្នក
+                    -- local fontFace = Font.new("rbxassetid://YOUR_KANTUMRUY_ID_HERE")
+                    -- obj.FontFace = fontFace
+                end)
+            end
+        end
+        print("[SP HUB] ✓ Khmer Font applied")
+    end)
+end
+
+-- ពន្យារពេលបន្តិចឱ្យ UI បង្កើតចប់សិន រួចប្តូរ Font
+task.delay(1, ApplyKhmerFont)
 
 --===================== ASYNC LOGO LOADER =====================
 task.spawn(function()
