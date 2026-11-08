@@ -5,25 +5,24 @@
 --   ╚════██║██╔═══╝     ██╔══██║██║   ██║██╔══██╗
 --   ███████║██║         ██║  ██║╚██████╔╝██████╔╝
 --   ╚══════╝╚═╝         ╚═╝  ╚═╝ ╚═════╝ ╚═════╝
---       SP ROBLOX SCRIPT HUB PRO v2.3
---       Key + Sound + Combo + Force UI Reset
+--       SP ROBLOX SCRIPT HUB PRO v2.1
+--       Key System + Sound + Combo Edition
 --       Developer: Sopha Panha | UI: Rayfield
 --==================================================
 
 local HttpService  = game:GetService("HttpService")
 local Players      = game:GetService("Players")
 local SoundService = game:GetService("SoundService")
-local UIS          = game:GetService("UserInputService")
 
 local LOGO_ID   = 116345727167504
 local VERSION   = "Delta-2.745.1142"
-local BUILD     = "PRO v2.3"
+local BUILD     = "PRO v2.1"
 local ICON_BASE = "https://raw.githubusercontent.com/Panha1414/SP-SCRIPT-HUB/main/"
 
 --===================== BOOT SEQUENCE =====================
 print("╔══════════════════════════════════════════╗")
 print("║  SP ROBLOX SCRIPT HUB " .. BUILD .. "           ║")
-print("║  Key + Sound + Combo + Force UI Reset    ║")
+print("║  Key System + Sound + Combo              ║")
 print("║  By Sopha Panha                          ║")
 print("╚══════════════════════════════════════════╝")
 
@@ -239,7 +238,7 @@ local Window = Rayfield:CreateWindow({
     LoadingSubtitle = "Premium Script Hub " .. BUILD .. " | By Sopha Panha",
     ShowText    = "SP HUB",
     Theme       = SPTheme,
-    -- ToggleUIKeybind = "K", -- 🔕 បិទ Keybind ដើម្បីការពារបញ្ហាអូស UI បាត់
+    ToggleUIKeybind = Enum.KeyCode.Unknown, -- បិទ Keybind បង្គោល
     DisableRayfieldPrompts  = true,
     DisableBuildWarnings    = true,
     ConfigurationSaving = {
@@ -267,45 +266,6 @@ local Window = Rayfield:CreateWindow({
     },
 })
 
---===================== 🛠️ FORCE UI RESET FUNCTION =====================
-local function ResetUIPosition()
-    pcall(function()
-        local Root = (gethui and gethui()) or game:GetService("CoreGui")
-        local RayfieldGui = Root:FindFirstChild("Rayfield")
-        if RayfieldGui then
-            local MainFrame = RayfieldGui:FindFirstChild("Main")
-            if MainFrame and MainFrame:IsA("GuiObject") then
-                -- ទាញ UI មកកណ្តាលអេក្រង់វិញ
-                MainFrame.Position = UDim2.new(0.5, -MainFrame.AbsoluteSize.X / 2, 0.5, -MainFrame.AbsoluteSize.Y / 2)
-                print("[SP HUB] បានកែទីតាំង UI មកកណ្តាលវិញ")
-            end
-        end
-    end)
-end
-
--- រង់ចាំ ១ វិនាទីឱ្យ UI ដំណើរការ រួចទាញវាមកកណ្តាលភ្លាម
-task.delay(1.5, ResetUIPosition)
-
--- បន្ថែមការពិនិត្យរាល់ពេលអូស UI បញ្ចប់ (ការពារការអូសបាត់)
-UIS.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        task.wait(0.1)
-        pcall(function()
-            local Root = (gethui and gethui()) or game:GetService("CoreGui")
-            local RayfieldGui = Root:FindFirstChild("Rayfield")
-            if RayfieldGui then
-                local MainFrame = RayfieldGui:FindFirstChild("Main")
-                if MainFrame and MainFrame:IsA("GuiObject") then
-                    -- ប្រសិនបើ UI រុញចេញក្រៅអេក្រង់ខ្លាំងពេក
-                    if MainFrame.AbsolutePosition.Y < -50 or MainFrame.AbsolutePosition.X < -50 then
-                        ResetUIPosition()
-                    end
-                end
-            end
-        end)
-    end
-end)
-
 --===================== HELPERS =====================
 local function Notify(title, content, duration)
     pcall(function()
@@ -328,13 +288,15 @@ local function CopyLink(label, link)
     end
 end
 
---===================== LOAD SCRIPT =====================
+--===================== LOAD SCRIPT (WITH COMBO SUPPORT) =====================
 local function LoadScript(script)
     if not script then return end
 
+    --═══════════ 🔥 COMBO MODE ═══════════
     if script.combo then
         Notify("🔥 Combo", "កំពុងបើក " .. #script.combo .. " scripts ព្រមគ្នា...", 3)
         local success = 0
+
         for i, sub in ipairs(script.combo) do
             Notify("⏳ " .. i .. "/" .. #script.combo, sub.name .. " loading...", 2)
             local ok, err = pcall(function()
@@ -372,6 +334,7 @@ local function LoadScript(script)
         return
     end
 
+    --═══════════ SINGLE SCRIPT MODE ═══════════
     Notify("⏳ Loading", script.name .. "...", 3)
     local ok, err = false, nil
     for attempt = 1, 2 do
@@ -442,6 +405,7 @@ local function CloseLoadedScripts()
             end
         end
     end
+
     pcall(function()
         if getgenv then
             getgenv().SP_Unload = true
@@ -681,20 +645,13 @@ InfoTab:CreateButton({
 local SettingsTab = Window:CreateTab("⚙️ Settings", "settings")
 
 SettingsTab:CreateSection("UI CONTROL")
-SettingsTab:CreateButton({
-    Name = "📌  RESET UI POSITION (ទាញមកកណ្តាល)",
-    Callback = function()
-        ResetUIPosition()
-        Notify("🛠️ Fixed", "UI ត្រូវបានទាញមកកណ្តាលវិញ", 3)
-    end,
-})
-SettingsTab:CreateButton({
-    Name = "📌  MINIMIZE UI (Safe Mode)",
-    Callback = function()
-        pcall(function()
-            Window:ToggleMinimise()
-        end)
-    end,
+SettingsTab:CreateLabel("Press K to Hide / Show UI", "keyboard")
+SettingsTab:CreateKeybind({
+    Name           = "Toggle UI Keybind",
+    CurrentKeybind = "K",
+    HoldToInteract = false,
+    Flag           = "SP_ToggleInfo",
+    Callback       = function() end,
 })
 
 --══════════ 🎵 SOUND SETTINGS ══════════
@@ -873,6 +830,187 @@ task.spawn(function()
         end)
     end
     print("[SP HUB] ✓ Script icons loaded")
+end)
+
+-- ការពារ UI បាត់ទីតាំងពេលអូស
+local UIS = game:GetService("UserInputService")
+
+-- មុខងារសម្រាប់ពិនិត្យ និងកែទីតាំង UI ឱ្យនៅក្នុងអេក្រង់
+local function EnsureUIVisible()
+    pcall(function()
+        -- ស្វែងរក UI របស់ Rayfield
+        local Root = (gethui and gethui()) or game:GetService("CoreGui")
+        local RayfieldGui = Root:FindFirstChild("Rayfield")
+        if RayfieldGui then
+            local MainFrame = RayfieldGui:FindFirstChild("Main")
+            if MainFrame and MainFrame:IsA("GuiObject") then
+                -- ប្រសិនបើទីតាំង X ឬ Y ចេញក្រៅអេក្រង់ (តិចជាង 0 ឬធំជាងទំហំអេក្រង់)
+                if MainFrame.AbsolutePosition.X < 0 or MainFrame.AbsolutePosition.Y < 0 
+                   or MainFrame.AbsolutePosition.X > workspace.CurrentCamera.ViewportSize.X 
+                   or MainFrame.AbsolutePosition.Y > workspace.CurrentCamera.ViewportSize.Y then
+                    -- កំណត់ទីតាំងឱ្យនៅកណ្តាលអេក្រង់វិញ
+                    MainFrame.Position = UDim2.new(0.5, -MainFrame.AbsoluteSize.X/2, 0.5, -MainFrame.AbsoluteSize.Y/2)
+                    print("[SP HUB] បានកែទីតាំង UI ឱ្យមកកណ្តាលវិញ")
+                end
+            end
+        end
+    end)
+end
+
+-- ពិនិត្យរាល់ពេលដែលអ្នកប្រើប្រាស់បញ្ចប់ការអូស (Drag)
+UIS.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        task.wait(0.1) -- រង់ចាំបន្តិចឱ្យ Animation បញ្ចប់
+        EnsureUIVisible()
+    end
+end)
+
+--===================== WINDOWS STYLE WINDOW CONTROLS =====================
+-- បន្ថែមប៊ូតុង Minimize / Maximize / Close នៅលើ Topbar របស់ SP HUB
+task.spawn(function()
+    task.wait(1)
+
+    local ok, err = pcall(function()
+        local Root = (gethui and gethui()) or game:GetService("CoreGui")
+        local RayfieldGui = Root:FindFirstChild("Rayfield")
+
+        if not RayfieldGui then
+            local PlayerGui = Players.LocalPlayer and Players.LocalPlayer:FindFirstChild("PlayerGui")
+            if PlayerGui then
+                RayfieldGui = PlayerGui:FindFirstChild("Rayfield")
+            end
+        end
+
+        assert(RayfieldGui, "រកមិនឃើញ Rayfield GUI")
+
+        local Main = RayfieldGui:WaitForChild("Main", 5)
+        assert(Main and Main:IsA("GuiObject"), "រកមិនឃើញ Main Frame")
+
+        local Topbar = Main:FindFirstChild("Topbar")
+        assert(Topbar, "រកមិនឃើញ Topbar")
+
+        -- កុំបង្កើតប៊ូតុងស្ទួន
+        if Topbar:FindFirstChild("SP_WindowsControls") then
+            Topbar.SP_WindowsControls:Destroy()
+        end
+
+        local Controls = Instance.new("Frame")
+        Controls.Name = "SP_WindowsControls"
+        Controls.BackgroundTransparency = 1
+        Controls.AnchorPoint = Vector2.new(1, 0.5)
+        Controls.Position = UDim2.new(1, -8, 0.5, 0)
+        Controls.Size = UDim2.fromOffset(102, 30)
+        Controls.ZIndex = 100
+        Controls.Parent = Topbar
+
+        local function MakeButton(name, caption, x, color)
+            local button = Instance.new("TextButton")
+            button.Name = name
+            button.Text = caption
+            button.Font = Enum.Font.Gotham
+            button.TextSize = 17
+            button.TextColor3 = Color3.fromRGB(235, 240, 250)
+            button.BackgroundColor3 = color or Color3.fromRGB(30, 36, 52)
+            button.BorderSizePixel = 0
+            button.Size = UDim2.fromOffset(30, 26)
+            button.Position = UDim2.fromOffset(x, 2)
+            button.ZIndex = 101
+            button.AutoButtonColor = true
+            button.Parent = Controls
+
+            local corner = Instance.new("UICorner")
+            corner.CornerRadius = UDim.new(0, 5)
+            corner.Parent = button
+
+            return button
+        end
+
+        local MinButton = MakeButton("Minimize", "—", 0)
+        local MaxButton = MakeButton("Maximize", "□", 36)
+        local CloseButton = MakeButton("Close", "×", 72, Color3.fromRGB(150, 45, 55))
+
+        local originalSize = Main.Size
+        local originalPosition = Main.Position
+        local originalAnchorPoint = Main.AnchorPoint
+        local originalClips = Main.ClipsDescendants
+        local minimized = false
+        local maximized = false
+        local sizeBeforeMax = originalSize
+        local positionBeforeMax = originalPosition
+
+        local function RestoreWindow()
+            Main.Size = originalSize
+            Main.Position = originalPosition
+            Main.AnchorPoint = originalAnchorPoint
+            Main.ClipsDescendants = originalClips
+            minimized = false
+            maximized = false
+            MaxButton.Text = "□"
+        end
+
+        MinButton.MouseButton1Click:Connect(function()
+            if minimized then
+                RestoreWindow()
+                return
+            end
+
+            if maximized then
+                Main.Size = sizeBeforeMax
+                Main.Position = positionBeforeMax
+                maximized = false
+                MaxButton.Text = "□"
+            end
+
+            originalSize = Main.Size
+            originalPosition = Main.Position
+            originalAnchorPoint = Main.AnchorPoint
+            Main.ClipsDescendants = true
+            Main.Size = UDim2.new(
+                originalSize.X.Scale,
+                originalSize.X.Offset,
+                0,
+                math.max(Topbar.AbsoluteSize.Y, 38)
+            )
+            minimized = true
+        end)
+
+        MaxButton.MouseButton1Click:Connect(function()
+            if minimized then
+                RestoreWindow()
+                return
+            end
+
+            if maximized then
+                Main.Size = sizeBeforeMax
+                Main.Position = positionBeforeMax
+                Main.AnchorPoint = originalAnchorPoint
+                Main.ClipsDescendants = originalClips
+                maximized = false
+                MaxButton.Text = "□"
+            else
+                sizeBeforeMax = Main.Size
+                positionBeforeMax = Main.Position
+                Main.AnchorPoint = Vector2.new(0, 0)
+                Main.Position = UDim2.fromOffset(20, 20)
+                Main.Size = UDim2.new(1, -40, 1, -40)
+                Main.ClipsDescendants = false
+                maximized = true
+                MaxButton.Text = "❐"
+            end
+        end)
+
+        CloseButton.MouseButton1Click:Connect(function()
+            pcall(function()
+                Rayfield:Destroy()
+            end)
+        end)
+
+        print("[SP HUB] ✓ Windows-style controls loaded")
+    end)
+
+    if not ok then
+        warn("[SP HUB] Windows controls error: " .. tostring(err))
+    end
 end)
 
 --===================== WELCOME + STARTUP SOUND =====================
